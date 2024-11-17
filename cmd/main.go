@@ -1,12 +1,14 @@
 package main
 
 import (
-  "log"
+	"log"
 
-  "github.com/gin-gonic/gin"
+	srv "github.com/MotyaSS/DB_CW/pkg/server"
 )
 
+const port string = ":8080"
+
 func main() {
-  a := gin.Default()
-  log.Fatal(a.Run(":8080"))
+	server := srv.NewServer()
+	log.Fatal(server.Run(port))
 }
