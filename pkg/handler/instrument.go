@@ -6,18 +6,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func getAllInstruments(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, "all instruments")
+func (*Handler) getAllInstruments(ctx *gin.Context) {
+	ctx.IndentedJSON(http.StatusOK, "all instruments")
 }
 
-func getInstrument(ctx *gin.Context) {
+func (*Handler) getInstrument(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "instrument number "+ctx.Param("inst_id"))
 }
 
-func addInstrument(ctx *gin.Context) {
+func (*Handler) addInstrument(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, "instrument added")
 }
 
-func deleteInstrument(ctx *gin.Context) {
+func (*Handler) deleteInstrument(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "instrument deleted")
 }

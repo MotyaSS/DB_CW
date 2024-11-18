@@ -1,14 +1,18 @@
 package main
 
 import (
-	"log"
-
-	srv "github.com/MotyaSS/DB_CW/pkg/server"
+	hnd "github.com/MotyaSS/DB_CW/pkg/handler"
+	srvr "github.com/MotyaSS/DB_CW/pkg/server"
+	srvc "github.com/MotyaSS/DB_CW/pkg/service"
+	strg "github.com/MotyaSS/DB_CW/pkg/storage"
 )
 
 const port string = ":8080"
 
 func main() {
-	server := srv.NewServer()
-	log.Fatal(server.Run(port))
+	storage := strg.New()
+	service := srvc.New(storage)
+	handler := hnd.New(service)
+	server := srvr.New(port, handler.InitRouter())
+	server.Run()
 }
