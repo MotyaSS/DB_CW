@@ -30,35 +30,33 @@ func (h *Handler) InitRouter() *gin.Engine {
 	items := router.Group("/instruments")
 	{
 		items.GET("/", h.getAllInstruments)
-		items.POST("/new", h.addInstrument)
+		items.POST("/", h.addInstrument)
 		item := items.Group("/:inst_id")
 		{
 			item.GET("/", h.getInstrument)
 			item.DELETE("/", h.deleteInstrument)
+			item.POST("/rent", h.rentInstrument)
 			reviews := item.Group("/reviews")
 			{
+				reviews.DELETE("/:review_id", h.deleteReview)
+				reviews.GET("/:review_id", h.getReview)
 				reviews.GET("/", h.getReviews)
 				reviews.POST("/", h.createReview)
-				reviews.DELETE("/:review_id", h.deleteReview)
-			}
-			rent := item.Group("/rent")
-			{
-				rent.POST("/")
 			}
 		}
 	}
 	stores := router.Group("/store")
 	{
-		stores.GET("/")
-		stores.POST("/")
-		stores.GET("/:store_id")
-		stores.DELETE("/:store_id")
+		stores.GET("/", h.getAllStores)
+		stores.GET("/:store_id", h.getStore)
+		stores.POST("/:store_id", h.createStore)
+		stores.DELETE("/:store_id", h.deleteStore)
 	}
 	users := router.Group("/user")
 	{
-		users.GET("/")
-		users.GET("/:user_id")
-		users.DELETE("/:user_id")
+		users.GET("/", h.getUsers)
+		users.GET("/:user_id", h.getUser)
+		users.DELETE("/:user_id", h.deleteUser)
 	}
 	return router
 }

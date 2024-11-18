@@ -7,9 +7,13 @@ import (
 )
 
 func (*Handler) signUp(ctx *gin.Context) {
-	ctx.JSON(http.StatusCreated, "user signed up")
+	ctx.JSON(
+		http.StatusCreated,
+		"user signed up")
 }
 
 func (*Handler) signIn(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, "user signed in")
+	ctx.JSON(
+		http.StatusOK,
+		"user signed in")
 }
