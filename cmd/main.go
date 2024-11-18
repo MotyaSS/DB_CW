@@ -17,7 +17,7 @@ func main() {
 	storage := strg.New()
 	service := srvc.New(storage)
 	handler := hnd.New(service)
-	server := srvr.New(config.HttpServer.Address, handler.InitRouter())
+	server := srvr.New(&config.HttpServer, handler.InitRouter())
 	server.Run()
 }
 

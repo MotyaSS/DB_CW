@@ -6,17 +6,21 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+
+	"github.com/MotyaSS/DB_CW/pkg/config"
 )
 
 type Server struct {
 	httpServer *http.Server
 }
 
-func New(address string, handler http.Handler) *Server {
+func New(cfg *config.HttpServer, handler http.Handler) *Server {
 	return &Server{
 		httpServer: &http.Server{
-			Addr:    address,
-			Handler: handler,
+			Addr:         cfg.Address,
+			ReadTimeout:  cfg.Timeout,
+			WriteTimeout: cfg.Timeout,
+			Handler:      handler,
 		},
 	}
 }
