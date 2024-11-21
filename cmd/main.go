@@ -13,7 +13,6 @@ import (
 
 func main() {
 	config := setupConfig()
-	log.Println(config)
 	storage := strg.New()
 	service := srvc.New(storage)
 	handler := hnd.New(service)
