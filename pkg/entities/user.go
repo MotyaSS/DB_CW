@@ -1,4 +1,4 @@
-package DB_CW
+package entity
 
 type User struct {
 	UserId      int    `json:"user_id"`

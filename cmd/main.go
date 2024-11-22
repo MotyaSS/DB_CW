@@ -12,8 +12,20 @@ import (
 )
 
 func main() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal(err)
+	}
 	config := setupConfig()
-	storage := strg.New()
+	db, err := strg.NewPostgresDB(strg.Config{
+		Host:     config.Database.Host,
+		Port:     config.Database.Port,
+		Username: config.Database.Username,
+		Password: config.Database.Password,
+		DBName:   config.Database.DBName,
+		SSLMode:  config.Database.SSLMode,
+	})
+	storage := strg.New(db)
 	service := srvc.New(storage)
 	handler := hnd.New(service)
 	server := srvr.New(&config.HttpServer, handler.InitRouter())
@@ -21,10 +33,6 @@ func main() {
 }
 
 func setupConfig() *cfg.Config {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal(err)
-	}
 	config, err := cfg.LoadConfig()
 	if err != nil {
 		log.Fatal(err)

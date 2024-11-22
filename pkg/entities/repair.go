@@ -1,4 +1,4 @@
-package DB_CW
+package entity
 
 import (
 	"time"

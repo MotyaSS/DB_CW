@@ -1,4 +1,4 @@
-package DB_CW
+package entity
 
 type Review struct {
 	ReviewId   int    `json:"review_id"`
