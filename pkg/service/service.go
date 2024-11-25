@@ -1,13 +1,18 @@
 package service
 
 import (
+	entity "github.com/MotyaSS/DB_CW/pkg/entities"
 	"github.com/MotyaSS/DB_CW/pkg/storage"
 )
 
 type Authorisation interface {
-}
-
-type User interface {
+	CreateUser(callerJWT string, user entity.User) (int, error)
+	CreateCustomer(user entity.User) (int, error)
+	CreateStaff(callerId int, user entity.User) (int, error)
+	CreateChief(callerId int, user entity.User) (int, error)
+	CreateAdmin(callerId int, user entity.User) (int, error)
+	GenerateToken(username, password string) (string, error)
+	ParseToken(token string) int
 }
 
 type Instrument interface {
@@ -24,16 +29,14 @@ type Store interface {
 
 type Service struct {
 	Authorisation
-	User
 	Instrument
 	Review
 	Rent
 	Store
-	storage *storage.Storage
 }
 
 func New(storage *storage.Storage) *Service {
 	return &Service{
-		storage: storage,
+		Authorisation: NewAuthService(storage),
 	}
 }

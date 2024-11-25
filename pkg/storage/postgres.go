@@ -4,6 +4,21 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
+)
+
+const (
+	usersTable         = "users"
+	rolesTable         = "roles"
+	storesTable        = "stores"
+	categoriesTable    = "categories"
+	manufacturersTable = "manufacturers"
+	instrumentsTable   = "instruments"
+	rentalsTable       = "rentals"
+	paymentsTable      = "payments"
+	repairsTable       = "repairs"
+	discountsTable     = "repairs"
+	reviewsTable       = "reviews"
 )
 
 type Config struct {

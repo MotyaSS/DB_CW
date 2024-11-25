@@ -9,7 +9,7 @@ CREATE TABLE users
     username      VARCHAR(255) UNIQUE NOT NULL,
     email         VARCHAR(255) UNIQUE NOT NULL,
     phone_number  VARCHAR(32)         NOT NULL,
-    password_hash CHAR(256),
+    password_hash VARCHAR(255)        NOT NULL,
     role_id       INT                 NOT NULL REFERENCES roles (role_id)
 );
 CREATE TABLE stores
@@ -79,10 +79,12 @@ CREATE TABLE reviews
     review_text TEXT,
     rating      INT CHECK (rating BETWEEN 1 AND 5)
 );
+
 -- Добавляем роли пользователей
 INSERT INTO roles (role_name)
 VALUES ('customer'),
        ('staff'),
+       ('chief'),
        ('admin');
 
 -- Добавляем магазины

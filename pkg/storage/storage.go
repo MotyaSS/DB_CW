@@ -1,13 +1,14 @@
 package storage
 
 import (
+	entity "github.com/MotyaSS/DB_CW/pkg/entities"
 	"github.com/jmoiron/sqlx"
 )
 
 type Authorisation interface {
-}
-
-type User interface {
+	CreateUser(user entity.User) (int, error)
+	GetUser(username, password string) (entity.User, error)
+	GetRole(roleId int) (entity.Role, error)
 }
 
 type Instrument interface {
@@ -24,7 +25,6 @@ type Store interface {
 
 type Storage struct {
 	Authorisation
-	User
 	Instrument
 	Review
 	Rent
@@ -32,5 +32,7 @@ type Storage struct {
 }
 
 func New(db *sqlx.DB) *Storage {
-	return &Storage{}
+	return &Storage{
+		Authorisation: NewAuthPostgres(db),
+	}
 }

@@ -17,7 +17,6 @@ type Instrument struct {
 type Manufacturer struct {
 	ManufacturerId   int    `json:"manufacturer_id"`
 	ManufacturerName string `json:"manufacturer_name"`
-	Description      string `json:"manufacturer_description"`
 }
 
 type Category struct {
