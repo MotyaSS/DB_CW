@@ -1,0 +1,1 @@
+### Переехать с jwt-go v3 на jwt-go v5 (StandardClaims -> RegisteredClaims)

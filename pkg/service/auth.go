@@ -16,13 +16,13 @@ const (
 	tokenTTL   = time.Hour * 12
 )
 
+type AuthService struct {
+	storage storage.Authorisation
+}
+
 type tokenClaims struct {
 	jwt.StandardClaims
 	UserId int `json:"user_id"`
-}
-
-type AuthService struct {
-	storage storage.Authorisation
 }
 
 func NewAuthService(storage storage.Authorisation) *AuthService {
