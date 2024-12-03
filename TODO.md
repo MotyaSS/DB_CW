@@ -1,1 +1,3 @@
-### Переехать с jwt-go v3 на jwt-go v5 (StandardClaims -> RegisteredClaims)
+- Переехать с jwt-go v3 на jwt-go v5 (StandardClaims -> RegisteredClaims)
+- Создание не-customer пользователей
+- имплементировать логику сервиса Instrument (и запросы бд)

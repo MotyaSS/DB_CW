@@ -45,3 +45,21 @@ func (s *AuthPostgres) GetRole(roleId int) (entity.Role, error) {
 	)
 	return role, err
 }
+func (s *AuthPostgres) GetRoleId(roleName string) (int, error) {
+	var role int
+	err := s.db.Get(
+		&role,
+		fmt.Sprintf("SELECT role_id FROM %s WHERE role_name=$1", rolesTable),
+		roleName,
+	)
+	return role, err
+}
+
+func (s *AuthPostgres) GetAllRoles() ([]entity.Role, error) {
+	var result []entity.Role
+	err := s.db.Select(
+		&result,
+		fmt.Sprintf("SELECT role_id, role_name FROM %s", rolesTable),
+	)
+	return result, err
+}

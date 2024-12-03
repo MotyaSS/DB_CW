@@ -23,42 +23,48 @@ func (h *Handler) InitRouter(middleware ...gin.HandlerFunc) *gin.Engine {
 	router.GET("/", func(context *gin.Context) {
 		context.JSON(http.StatusOK, "welcome page")
 	})
+
+	// TODO: sign up for non-customers
+	//
+
 	auth := router.Group("/")
 	{
 		auth.POST("/sign-up", h.signUp)
+		auth.GET("/sign-up/roles", h.userIdentity, h.getAllRoles)
+		auth.POST("/sign-up/:role", h.userIdentity, h.signUpPrivileged)
 		auth.POST("/sign-in", h.signIn)
 	}
-
-	// TODO: sign up for non-customers
-
 	items := router.Group("/instruments")
 	{
 		items.GET("/", h.getAllInstruments)
-		items.POST("/", h.addInstrument)
+		items.POST("/", h.userIdentity, h.addInstrument)
+
 		item := items.Group("/:inst_id")
 		{
+			item.POST("/rent", h.userIdentity, h.rentInstrument)
 			item.GET("/", h.getInstrument)
-			item.DELETE("/", h.deleteInstrument)
-			item.POST("/rent", h.rentInstrument)
+			item.DELETE("/", h.userIdentity, h.deleteInstrument)
+
 			reviews := item.Group("/reviews")
 			{
-				reviews.DELETE("/:review_id", h.deleteReview)
+				reviews.DELETE("/:review_id", h.userIdentity, h.deleteReview)
 				reviews.GET("/:review_id", h.getReview)
-				reviews.GET("/", h.getReviews)
-				reviews.POST("/", h.createReview)
+				reviews.GET("/", h.getAllReviews)
+				reviews.POST("/", h.userIdentity, h.createReview)
 			}
 		}
 	}
+
 	stores := router.Group("/store")
 	{
 		stores.GET("/", h.getAllStores)
 		stores.GET("/:store_id", h.getStore)
-		stores.POST("/:store_id", h.createStore)
-		stores.DELETE("/:store_id", h.deleteStore)
+		stores.POST("/:store_id", h.userIdentity, h.createStore)
+		stores.DELETE("/:store_id", h.userIdentity, h.deleteStore)
 	}
-	users := router.Group("/user")
+	users := router.Group("/users", h.userIdentity)
 	{
-		users.GET("/", h.getUsers)
+		users.GET("/", h.getAllUsers)
 		users.GET("/:user_id", h.getUser)
 		users.DELETE("/:user_id", h.deleteUser)
 	}

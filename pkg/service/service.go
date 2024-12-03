@@ -6,16 +6,21 @@ import (
 )
 
 type Authorisation interface {
-	CreateUser(callerJWT string, user entity.User) (int, error)
+	GetAllRoles() ([]entity.Role, error)
+	GetUserRole(userId int) (entity.Role, error)
+
+	CreateUser(callerId int, user entity.User) (int, error)
 	CreateCustomer(user entity.User) (int, error)
 	CreateStaff(callerId int, user entity.User) (int, error)
 	CreateChief(callerId int, user entity.User) (int, error)
 	CreateAdmin(callerId int, user entity.User) (int, error)
+
 	GenerateToken(username, password string) (string, error)
-	ParseToken(token string) int
+	ParseToken(token string) (int, error)
 }
 
 type Instrument interface {
+	GetAllInstruments(filter entity.InstFilter) ([]entity.Instrument, error)
 }
 
 type Review interface {
@@ -38,5 +43,6 @@ type Service struct {
 func New(storage *storage.Storage) *Service {
 	return &Service{
 		Authorisation: NewAuthService(storage),
+		Instrument:    NewInstService(storage),
 	}
 }

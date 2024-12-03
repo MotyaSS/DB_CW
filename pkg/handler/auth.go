@@ -1,11 +1,20 @@
 package handler
 
 import (
+	"math"
 	"net/http"
 
 	entity "github.com/MotyaSS/DB_CW/pkg/entities"
 	"github.com/gin-gonic/gin"
 )
+
+func (h *Handler) getAllRoles(ctx *gin.Context) {
+	res, err := h.service.GetAllRoles()
+	if err != nil {
+		abortWithStatusCode(ctx, http.StatusInternalServerError, err.Error())
+	}
+	ctx.JSON(http.StatusOK, res)
+}
 
 func (h *Handler) signUp(ctx *gin.Context) {
 	var input entity.User
@@ -15,8 +24,36 @@ func (h *Handler) signUp(ctx *gin.Context) {
 		return
 	}
 
-	// TODO: change logic here to handle with CreateUser method and handle request with no role_id
 	id, err := h.service.Authorisation.CreateCustomer(input)
+	if err != nil {
+		abortWithStatusCode(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, map[string]any{
+		"id": id,
+	})
+}
+
+func (h *Handler) signUpPrivileged(ctx *gin.Context) {
+	callerId, err := h.getCallerId(ctx)
+	if err != nil {
+		abortWithStatusCode(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	var input entity.User
+	input.RoleId = math.MinInt
+	if err := ctx.BindJSON(&input); err != nil {
+		abortWithStatusCode(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+	if input.RoleId == math.MinInt {
+		abortWithStatusCode(ctx, http.StatusBadRequest, "no role provided")
+		return
+	}
+
+	id, err := h.service.Authorisation.CreateUser(callerId, input)
 	if err != nil {
 		abortWithStatusCode(ctx, http.StatusInternalServerError, err.Error())
 		return
