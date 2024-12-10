@@ -19,6 +19,7 @@ func New(service *service.Service) *Handler {
 
 func (h *Handler) InitRouter(middleware ...gin.HandlerFunc) *gin.Engine {
 	router := gin.Default()
+	apiRouter := router.Group("/api")
 	router.Use(middleware...)
 	router.GET("/", func(context *gin.Context) {
 		context.JSON(http.StatusOK, "welcome page")
@@ -27,14 +28,14 @@ func (h *Handler) InitRouter(middleware ...gin.HandlerFunc) *gin.Engine {
 	// TODO: sign up for non-customers
 	//
 
-	auth := router.Group("/")
+	auth := apiRouter.Group("/")
 	{
 		auth.POST("/sign-up", h.signUp)
 		auth.GET("/sign-up/roles", h.userIdentity, h.getAllRoles)
 		auth.POST("/sign-up/:role", h.userIdentity, h.signUpPrivileged)
 		auth.POST("/sign-in", h.signIn)
 	}
-	items := router.Group("/instruments")
+	items := apiRouter.Group("/instruments")
 	{
 		items.GET("/", h.getAllInstruments)
 		items.POST("/", h.userIdentity, h.addInstrument)
@@ -55,14 +56,14 @@ func (h *Handler) InitRouter(middleware ...gin.HandlerFunc) *gin.Engine {
 		}
 	}
 
-	stores := router.Group("/store")
+	stores := apiRouter.Group("/store")
 	{
 		stores.GET("/", h.getAllStores)
 		stores.GET("/:store_id", h.getStore)
 		stores.POST("/:store_id", h.userIdentity, h.createStore)
 		stores.DELETE("/:store_id", h.userIdentity, h.deleteStore)
 	}
-	users := router.Group("/users", h.userIdentity)
+	users := apiRouter.Group("/users", h.userIdentity)
 	{
 		users.GET("/", h.getAllUsers)
 		users.GET("/:user_id", h.getUser)
