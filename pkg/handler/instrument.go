@@ -2,11 +2,10 @@ package handler
 
 import (
 	"fmt"
-	"log/slog"
 	"net/http"
 	"strconv"
 
-	"github.com/MotyaSS/DB_CW/pkg/entities"
+	entity "github.com/MotyaSS/DB_CW/pkg/entities"
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
 )
@@ -22,7 +21,7 @@ func setupInstFilter(ctx *gin.Context) (entity.InstFilter, error) {
 		f.AddManufacturer(param)
 	}
 
-	param = ctx.DefaultQuery("page", "0")
+	param = ctx.DefaultQuery("page", "1")
 	page, err := strconv.Atoi(param)
 	if err != nil {
 		return f, fmt.Errorf("incorrect page format")
@@ -51,38 +50,53 @@ func setupInstFilter(ctx *gin.Context) (entity.InstFilter, error) {
 }
 
 func (h *Handler) getAllInstruments(ctx *gin.Context) {
-	a, err := setupInstFilter(ctx)
+	filter, err := setupInstFilter(ctx)
 	if err != nil {
 		abortWithStatusCode(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	slog.Info("InstFilter initialized correctly", "InstFilter", a)
-	res, err := h.service.Instrument.GetAllInstruments(a)
+	res, err := h.service.Instrument.GetAllInstruments(filter)
 	if err != nil {
 		abortWithStatusCode(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 	ctx.JSON(
 		http.StatusOK,
-		res,
+		gin.H{"items": res},
 	)
 }
 
 func (h *Handler) getInstrument(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Param("inst_id"))
+	if err != nil {
+		abortWithStatusCode(ctx, http.StatusBadRequest, "incorrect id format")
+		return
+	}
+	inst, err := h.service.Instrument.GetInstrument(id)
+	if err != nil {
+		abortWithStatusCode(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
 	ctx.JSON(
 		http.StatusOK,
-		[]string{
-			"instrument number ",
-			ctx.Param("inst_id"),
-		},
+		inst,
 	)
 }
 
-func (h *Handler) addInstrument(ctx *gin.Context) {
+func (h *Handler) createInstrument(ctx *gin.Context) {
+	var inst entity.Instrument
+	if err := ctx.BindJSON(&inst); err != nil {
+
+	}
+	id, err := h.service.Instrument.CreateInstrument(inst)
+	if err != nil {
+		abortWithStatusCode(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
 	ctx.JSON(
-		http.StatusCreated,
-		"instrument added",
+		http.StatusOK,
+		gin.H{"id": id},
 	)
 }
 

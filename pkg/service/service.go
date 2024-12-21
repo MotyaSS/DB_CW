@@ -21,6 +21,8 @@ type Authorisation interface {
 
 type Instrument interface {
 	GetAllInstruments(filter entity.InstFilter) ([]entity.Instrument, error)
+	GetInstrument(id int) (entity.Instrument, error)
+	CreateInstrument(instrument entity.Instrument) (id int, err error)
 }
 
 type Review interface {

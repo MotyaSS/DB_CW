@@ -16,3 +16,10 @@ func NewInstService(storage storage.Instrument) *InstService {
 func (s *InstService) GetAllInstruments(filter entity.InstFilter) ([]entity.Instrument, error) {
 	return s.storage.GetAllInstruments(filter)
 }
+
+func (s *InstService) GetInstrument(id int) (entity.Instrument, error) {
+	return s.storage.GetInstrument(id)
+}
+func (s *InstService) CreateInstrument(instrument entity.Instrument) (id int, err error) {
+	return s.storage.CreateInstrument(instrument)
+}

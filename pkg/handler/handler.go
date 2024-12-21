@@ -35,10 +35,11 @@ func (h *Handler) InitRouter(middleware ...gin.HandlerFunc) *gin.Engine {
 		auth.POST("/sign-up/:role", h.userIdentity, h.signUpPrivileged)
 		auth.POST("/sign-in", h.signIn)
 	}
+
 	items := apiRouter.Group("/instruments")
 	{
 		items.GET("/", h.getAllInstruments)
-		items.POST("/", h.userIdentity, h.addInstrument)
+		items.POST("/", h.userIdentity, h.createInstrument)
 
 		item := items.Group("/:inst_id")
 		{
