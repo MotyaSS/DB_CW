@@ -11,7 +11,7 @@ import (
 func (h *Handler) getAllRoles(ctx *gin.Context) {
 	res, err := h.service.GetAllRoles()
 	if err != nil {
-		abortWithStatusCode(ctx, http.StatusInternalServerError, err.Error())
+		abortWithError(ctx, err)
 	}
 	ctx.JSON(http.StatusOK, res)
 }
@@ -26,7 +26,7 @@ func (h *Handler) signUp(ctx *gin.Context) {
 
 	id, err := h.service.Authorisation.CreateCustomer(input)
 	if err != nil {
-		abortWithStatusCode(ctx, http.StatusInternalServerError, err.Error())
+		abortWithError(ctx, err)
 		return
 	}
 
@@ -78,7 +78,7 @@ func (h *Handler) signIn(ctx *gin.Context) {
 
 	token, err := h.service.Authorisation.GenerateToken(input.Username, input.Password)
 	if err != nil {
-		abortWithStatusCode(ctx, http.StatusInternalServerError, err.Error())
+		abortWithError(ctx, err)
 		return
 	}
 

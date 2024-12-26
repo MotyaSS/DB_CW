@@ -1,10 +1,16 @@
 package storage
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
+	"log/slog"
+	"net/http"
 
 	entity "github.com/MotyaSS/DB_CW/pkg/entities"
+	"github.com/MotyaSS/DB_CW/pkg/httpError"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type AuthPostgres struct {
@@ -16,16 +22,32 @@ func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
 }
 
 func (s *AuthPostgres) CreateUser(user entity.User) (int, error) {
+	slog.Debug("CreateUser invoked", "user", []string{user.Username, user.Email})
 	var id int
 	query := fmt.Sprintf("INSERT INTO %s (username, email, phone_number, password_hash, role_id) VALUES ($1, $2, $3, $4, $5) RETURNING user_id", usersTable)
 	row := s.db.QueryRow(query, user.Username, user.Email, user.PhoneNumber, user.Password, user.RoleId)
-	if err := row.Scan(&id); err != nil {
+	err := row.Scan(&id)
+	if err == nil {
+		return id, nil
+	}
+	var pqErr *pq.Error
+	ok := errors.As(err, &pqErr)
+	if !ok {
 		return 0, err
 	}
-	return id, nil
+
+	switch pqErr.Code.Name() {
+	case "unique_violation":
+		return id, &httpError.ErrorWithStatusCode{
+			HTTPStatus: http.StatusBadRequest,
+			Msg:        "user with this username already exists",
+		}
+	}
+	return id, err
 }
 
 func (s *AuthPostgres) GetUser(username, password string) (entity.User, error) {
+	slog.Debug("GetUser invoked", "username", username)
 	var user entity.User
 	err := s.db.Get(
 		&user,
@@ -33,6 +55,14 @@ func (s *AuthPostgres) GetUser(username, password string) (entity.User, error) {
 		username,
 		password,
 	)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return user, &httpError.ErrorWithStatusCode{
+			HTTPStatus: http.StatusBadRequest,
+			Msg:        "incorrect username or password",
+		}
+	}
+
 	return user, err
 }
 

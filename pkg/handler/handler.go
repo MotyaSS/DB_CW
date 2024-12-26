@@ -31,8 +31,7 @@ func (h *Handler) InitRouter(middleware ...gin.HandlerFunc) *gin.Engine {
 	auth := apiRouter.Group("/")
 	{
 		auth.POST("/sign-up", h.signUp)
-		auth.GET("/sign-up/roles", h.userIdentity, h.getAllRoles)
-		auth.POST("/sign-up/:role", h.userIdentity, h.signUpPrivileged)
+		auth.GET("/roles", h.userIdentity, h.getAllRoles)
 		auth.POST("/sign-in", h.signIn)
 	}
 
@@ -46,7 +45,12 @@ func (h *Handler) InitRouter(middleware ...gin.HandlerFunc) *gin.Engine {
 			item.POST("/rent", h.userIdentity, h.rentInstrument)
 			item.GET("/", h.getInstrument)
 			item.DELETE("/", h.userIdentity, h.deleteInstrument)
-
+			repairment := item.Group("/repair")
+			{
+				repairment.POST("/", h.userIdentity, h.createRepair)
+				repairment.GET("/", h.getAllRepairs)
+				repairment.GET("/:repair_id", h.getRepair)
+			}
 			reviews := item.Group("/reviews")
 			{
 				reviews.DELETE("/:review_id", h.userIdentity, h.deleteReview)
@@ -57,7 +61,7 @@ func (h *Handler) InitRouter(middleware ...gin.HandlerFunc) *gin.Engine {
 		}
 	}
 
-	stores := apiRouter.Group("/store")
+	stores := apiRouter.Group("/stores")
 	{
 		stores.GET("/", h.getAllStores)
 		stores.GET("/:store_id", h.getStore)

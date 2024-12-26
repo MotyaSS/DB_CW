@@ -1,10 +1,17 @@
 package storage
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
+	"log/slog"
+	"net/http"
+	"strings"
 
 	entity "github.com/MotyaSS/DB_CW/pkg/entities"
+	"github.com/MotyaSS/DB_CW/pkg/httpError"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type InstPostgres struct {
@@ -23,6 +30,12 @@ func (s *InstPostgres) GetInstrument(id int) (entity.Instrument, error) {
 	var instrument entity.Instrument
 	query := fmt.Sprintf("SELECT * FROM %s WHERE instrument_id = $1", instrumentsTable)
 	err := s.db.Get(&instrument, query, id)
+	if errors.Is(err, sql.ErrNoRows) {
+		return instrument, &httpError.ErrorWithStatusCode{
+			HTTPStatus: http.StatusNotFound,
+			Msg:        fmt.Sprintf("instrument with id %d not found", id),
+		}
+	}
 	return instrument, err
 }
 
@@ -79,5 +92,47 @@ func (s *InstPostgres) CreateInstrument(instrument entity.Instrument) (id int, e
 		instrument.ManufacturerId,
 		instrument.Description,
 		instrument.PricePerDay).Scan(&id)
-	return id, err
+
+	if err == nil {
+		return id, err
+	}
+
+	var pqErr *pq.Error
+	ok := errors.As(err, &pqErr)
+	if !ok {
+		return id, err
+	}
+
+	switch pqErr.Code.Name() {
+	case "foreign_key_violation":
+		var field string
+		var value int
+		switch {
+		case strings.Contains(pqErr.Detail, "category_id"):
+			field = "category"
+			value = instrument.CategoryId
+			break
+		case strings.Contains(pqErr.Detail, "store_id"):
+			field = "store"
+			value = instrument.StoreId
+			break
+		case strings.Contains(pqErr.Detail, "manufacturer_id"):
+			field = "manufacturer"
+			value = instrument.ManufacturerId
+			break
+		}
+		return id, &httpError.ErrorWithStatusCode{
+			HTTPStatus: http.StatusNotFound,
+			Msg:        fmt.Sprintf("%s with id %d not found", field, value),
+		}
+	}
+
+	slog.Error("unknown internal server error during creating instrument",
+		"err", pqErr.Message,
+	)
+
+	return id, &httpError.ErrorWithStatusCode{
+		HTTPStatus: http.StatusInternalServerError,
+		Msg:        fmt.Sprintf("internal server error during creating instrument"),
+	}
 }

@@ -3,6 +3,7 @@ package server
 import (
 	"errors"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -25,6 +26,7 @@ func New(addr string, timeout time.Duration, handler http.Handler) *Server {
 }
 
 func (s *Server) Run() {
+	slog.Info("Server started at", "address", s.httpServer.Addr)
 	go func() {
 		quit := make(chan os.Signal)
 		signal.Notify(quit)

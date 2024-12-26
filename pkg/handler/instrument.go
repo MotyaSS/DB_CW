@@ -1,11 +1,13 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 
 	entity "github.com/MotyaSS/DB_CW/pkg/entities"
+	"github.com/MotyaSS/DB_CW/pkg/httpError"
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
 )
@@ -50,16 +52,22 @@ func setupInstFilter(ctx *gin.Context) (entity.InstFilter, error) {
 }
 
 func (h *Handler) getAllInstruments(ctx *gin.Context) {
+	// TODO: should return instruments with discount if exists
 	filter, err := setupInstFilter(ctx)
 	if err != nil {
-		abortWithStatusCode(ctx, http.StatusBadRequest, err.Error())
+		httpErr := &httpError.ErrorWithStatusCode{}
+		ok := errors.As(err, &httpErr)
+		if ok {
+			abortWithStatusCode(ctx, httpErr.HTTPStatus, httpErr.Msg)
+		} else {
+			abortWithStatusCode(ctx, http.StatusInternalServerError, err.Error())
+		}
 		return
 	}
 
 	res, err := h.service.Instrument.GetAllInstruments(filter)
 	if err != nil {
-		abortWithStatusCode(ctx, http.StatusInternalServerError, err.Error())
-		return
+		abortWithError(ctx, err)
 	}
 	ctx.JSON(
 		http.StatusOK,
@@ -68,14 +76,14 @@ func (h *Handler) getAllInstruments(ctx *gin.Context) {
 }
 
 func (h *Handler) getInstrument(ctx *gin.Context) {
+	// TODO: should return instrument with discount if exists
 	id, err := strconv.Atoi(ctx.Param("inst_id"))
 	if err != nil {
-		abortWithStatusCode(ctx, http.StatusBadRequest, "incorrect id format")
-		return
+		abortWithError(ctx, err)
 	}
 	inst, err := h.service.Instrument.GetInstrument(id)
 	if err != nil {
-		abortWithStatusCode(ctx, http.StatusInternalServerError, err.Error())
+		abortWithError(ctx, err)
 		return
 	}
 	ctx.JSON(
@@ -87,11 +95,12 @@ func (h *Handler) getInstrument(ctx *gin.Context) {
 func (h *Handler) createInstrument(ctx *gin.Context) {
 	var inst entity.Instrument
 	if err := ctx.BindJSON(&inst); err != nil {
-
+		abortWithError(ctx, err)
+		return
 	}
 	id, err := h.service.Instrument.CreateInstrument(inst)
 	if err != nil {
-		abortWithStatusCode(ctx, http.StatusInternalServerError, err.Error())
+		abortWithError(ctx, err)
 		return
 	}
 	ctx.JSON(
