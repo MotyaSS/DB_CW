@@ -36,7 +36,7 @@ func setupInstFilter(ctx *gin.Context) (entity.InstFilter, error) {
 		if err != nil {
 			return f, fmt.Errorf("incorrect price format")
 		}
-		f.AddPriceFloor(&d)
+		f.AddPriceFloor(d)
 	}
 
 	param, exists = ctx.GetQuery("ceil")
@@ -45,7 +45,7 @@ func setupInstFilter(ctx *gin.Context) (entity.InstFilter, error) {
 		if err != nil {
 			return f, fmt.Errorf("incorrect price format")
 		}
-		f.AddPriceCeil(&d)
+		f.AddPriceCeil(d)
 	}
 
 	return f, nil
@@ -68,6 +68,7 @@ func (h *Handler) getAllInstruments(ctx *gin.Context) {
 	res, err := h.service.Instrument.GetAllInstruments(filter)
 	if err != nil {
 		abortWithError(ctx, err)
+		return
 	}
 	ctx.JSON(
 		http.StatusOK,
@@ -110,18 +111,44 @@ func (h *Handler) createInstrument(ctx *gin.Context) {
 }
 
 func (h *Handler) deleteInstrument(ctx *gin.Context) {
+	callerId, err := h.getCallerId(ctx)
+	if err != nil {
+		abortWithError(ctx, err)
+		return
+	}
+	instId, err := strconv.Atoi(ctx.Param("inst_id"))
+	if err != nil {
+		abortWithError(ctx, err)
+		return
+	}
+	err = h.service.Instrument.DeleteInstrument(callerId, instId)
+	if err != nil {
+		abortWithError(ctx, err)
+		return
+	}
 	ctx.JSON(
-		http.StatusOK,
-		[]string{
-			"instrument deleted",
-			ctx.Param("inst_id"),
-		},
+		http.StatusNoContent, nil,
 	)
 }
 
 func (h *Handler) rentInstrument(ctx *gin.Context) {
+	callerId, err := h.getCallerId(ctx)
+	if err != nil {
+		abortWithError(ctx, err)
+		return
+	}
+	instId, err := strconv.Atoi(ctx.Param("inst_id"))
+	if err != nil {
+		abortWithError(ctx, err)
+		return
+	}
+	id, err := h.service.Rent.CreateRental(callerId, instId)
+	if err != nil {
+		abortWithError(ctx, err)
+		return
+	}
 	ctx.JSON(
 		http.StatusOK,
-		"instrument rented",
+		gin.H{"id": id},
 	)
 }

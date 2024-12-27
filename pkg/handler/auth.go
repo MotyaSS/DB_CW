@@ -16,15 +16,30 @@ func (h *Handler) getAllRoles(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+type signUpInput struct {
+	Username    string `json:"username" binding:"required"`
+	Email       string `json:"email" binding:"required,email"`
+	PhoneNumber string `json:"phone_number" binding:"required,e164"`
+	Password    string `json:"password" binding:"required"`
+}
+
 func (h *Handler) signUp(ctx *gin.Context) {
-	var input entity.User
+	var input signUpInput
 
 	if err := ctx.BindJSON(&input); err != nil {
 		abortWithStatusCode(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	id, err := h.service.Authorisation.CreateCustomer(input)
+	user := entity.User{
+		Username:    input.Username,
+		Email:       input.Email,
+		PhoneNumber: input.PhoneNumber,
+		Password:    input.Password,
+		RoleId:      entity.RoleCustomerId,
+	}
+
+	id, err := h.service.Authorisation.CreateCustomer(user)
 	if err != nil {
 		abortWithError(ctx, err)
 		return

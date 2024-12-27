@@ -3,21 +3,20 @@ package service
 import (
 	"crypto/sha256"
 	"fmt"
+	"log/slog"
+	"net/http"
 	"time"
 
 	entity "github.com/MotyaSS/DB_CW/pkg/entities"
+	"github.com/MotyaSS/DB_CW/pkg/httpError"
 	"github.com/MotyaSS/DB_CW/pkg/storage"
 	"github.com/dgrijalva/jwt-go"
 )
 
 const (
-	salt         = "Solevoy!gv13fa788fy0a67sDf4"
-	signingKey   = "nzo38r9b09&a^1_@)_u09ahj1;a"
-	tokenTTL     = time.Hour * 12
-	roleCustomer = "customer"
-	roleStaff    = "staff"
-	roleChief    = "chief"
-	roleAdmin    = "admin"
+	salt       = "Solevoy!gv13fa788fy0a67sDf4"
+	signingKey = "nzo38r9b09&a^1_@)_u09ahj1;a"
+	tokenTTL   = time.Hour * 12
 )
 
 type AuthService struct {
@@ -33,82 +32,126 @@ func NewAuthService(storage storage.Authorisation) *AuthService {
 	return &AuthService{storage: storage}
 }
 
+// hasPermission checks if the user role has sufficient permissions for the required role
+func hasPermission(userRole, requiredRole entity.Role) bool {
+	// Admin has all permissions
+	if userRole.RoleId == entity.RoleAdminId {
+		return true
+	}
+
+	// Chief can manage staff and customers
+	if userRole.RoleId == entity.RoleChiefId {
+		return requiredRole.RoleId <= entity.RoleChiefId
+	}
+
+	// Staff can manage customers
+	if userRole.RoleId == entity.RoleStaffId {
+		return requiredRole.RoleId <= entity.RoleStaffId
+	}
+
+	// Customers can only access customer-level permissions
+	if userRole.RoleId == entity.RoleCustomerId {
+		return requiredRole.RoleId == entity.RoleCustomerId
+	}
+
+	return false
+}
+
+// CheckPermission checks if the user has the required role or higher
+func (s *AuthService) CheckPermission(userId int, requiredRole entity.Role) error {
+	userRole, err := s.storage.GetRole(userId)
+	if err != nil {
+		return &httpError.ErrorWithStatusCode{
+			HTTPStatus: http.StatusInternalServerError,
+			Msg:        "error getting user role",
+		}
+	}
+
+	if !hasPermission(userRole, requiredRole) {
+		return &httpError.ErrorWithStatusCode{
+			HTTPStatus: http.StatusForbidden,
+			Msg:        "insufficient permissions",
+		}
+	}
+
+	return nil
+}
+
 func (s *AuthService) GetAllRoles() ([]entity.Role, error) {
 	return s.storage.GetAllRoles()
 }
 
 func (s *AuthService) GetUserRole(userId int) (entity.Role, error) {
-	return s.storage.GetRole(userId)
+	role, err := s.storage.GetRole(userId)
+	if err != nil {
+		return entity.Role{}, &httpError.ErrorWithStatusCode{
+			HTTPStatus: http.StatusInternalServerError,
+			Msg:        "error getting user role",
+		}
+	}
+	return role, nil
+}
+
+func (s *AuthService) CreateCustomer(user entity.User) (int, error) {
+	user.Password = generatePasswordHash(user.Password)
+	if user.RoleId != entity.RoleCustomerId {
+		slog.Info("Role mismatch: expected customer, got different. Created user with customer role", "role", user.RoleId)
+	}
+	user.RoleId = entity.RoleCustomerId
+	return s.storage.CreateUser(user)
 }
 
 func (s *AuthService) CreateUser(callerId int, user entity.User) (int, error) {
-	//Get role id here and check if user can create
-	user.Password = generatePasswordHash(user.Password)
-	role, err := s.storage.GetRole(user.RoleId)
-	if err != nil {
-		return 0, fmt.Errorf("role doesn't exist")
+	// If callerId is -1, it means we're creating a customer account (self-registration)
+	if callerId == -1 {
+		if user.RoleId != entity.RoleCustomerId {
+			return 0, &httpError.ErrorWithStatusCode{
+				HTTPStatus: http.StatusForbidden,
+				Msg:        "self-registration is only allowed for customer accounts",
+			}
+		}
+		user.Password = generatePasswordHash(user.Password)
+		return s.storage.CreateUser(user)
 	}
 
-	switch role.RoleName {
-	case "customer":
-		return s.CreateCustomer(user)
-	case "staff":
-		return s.CreateStaff(callerId, user)
-	case "chief":
-		return s.CreateChief(callerId, user)
-	case "admin":
-		return s.CreateAdmin(callerId, user)
-	default:
-		return 0, fmt.Errorf("no handler for such role")
+	// Check if caller has permission to create users with this role
+	callerRole, err := s.GetUserRole(callerId)
+	if err != nil {
+		return 0, err
 	}
+
+	// Only admin can create admin accounts
+	if user.RoleId == entity.RoleAdminId && callerRole.RoleId != entity.RoleAdminId {
+		return 0, &httpError.ErrorWithStatusCode{
+			HTTPStatus: http.StatusForbidden,
+			Msg:        "only admins can create admin accounts",
+		}
+	}
+
+	// Chief and higher can create staff accounts
+	if user.RoleId == entity.RoleStaffId && callerRole.RoleId < entity.RoleChiefId {
+		return 0, &httpError.ErrorWithStatusCode{
+			HTTPStatus: http.StatusForbidden,
+			Msg:        "insufficient permissions to create staff accounts",
+		}
+	}
+
+	// Only admin can create chief accounts
+	if user.RoleId == entity.RoleChiefId && callerRole.RoleId != entity.RoleAdminId {
+		return 0, &httpError.ErrorWithStatusCode{
+			HTTPStatus: http.StatusForbidden,
+			Msg:        "only admins can create chief accounts",
+		}
+	}
+
+	user.Password = generatePasswordHash(user.Password)
+	return s.storage.CreateUser(user)
 }
 
 func generatePasswordHash(password string) string {
 	hash := sha256.New()
 	hash.Write([]byte(password))
-
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
-}
-
-func (s *AuthService) CreateCustomer(user entity.User) (int, error) {
-	//Get role id here and check if user can create
-	roleId, err := s.storage.GetRoleId(roleCustomer)
-	if err != nil {
-		return 0, err
-	}
-	user.RoleId = roleId
-	return s.storage.CreateUser(user)
-}
-
-//
-// TODO: WHATS BELOW
-//
-
-func (s *AuthService) CreateStaff(callerId int, user entity.User) (int, error) {
-	roleId, err := s.storage.GetRoleId(roleStaff)
-	if err != nil {
-		return 0, err
-	}
-	user.RoleId = roleId
-	return s.storage.CreateUser(user)
-}
-
-func (s *AuthService) CreateChief(callerId int, user entity.User) (int, error) {
-	roleId, err := s.storage.GetRoleId(roleChief)
-	if err != nil {
-		return 0, err
-	}
-	user.RoleId = roleId
-	return s.storage.CreateUser(user)
-}
-
-func (s *AuthService) CreateAdmin(callerId int, user entity.User) (int, error) {
-	roleId, err := s.storage.GetRoleId(roleAdmin)
-	if err != nil {
-		return 0, err
-	}
-	user.RoleId = roleId
-	return s.storage.CreateUser(user)
 }
 
 func (s *AuthService) GenerateToken(username, password string) (string, error) {
@@ -137,16 +180,21 @@ func (s *AuthService) ParseToken(accessToken string) (int, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("invalid signing method")
 			}
-
 			return []byte(signingKey), nil
 		})
 	if err != nil {
-		return 0, err
+		return 0, &httpError.ErrorWithStatusCode{
+			HTTPStatus: http.StatusUnauthorized,
+			Msg:        err.Error(),
+		}
 	}
 
 	claims, ok := token.Claims.(*tokenClaims)
 	if !ok {
-		return 0, fmt.Errorf("token claims are not of type *tokenClaims")
+		return 0, &httpError.ErrorWithStatusCode{
+			HTTPStatus: http.StatusUnauthorized,
+			Msg:        "token claims are not of type *tokenClaims",
+		}
 	}
 
 	return claims.UserId, nil

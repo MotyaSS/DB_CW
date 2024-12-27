@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
+	"time"
 
 	entity "github.com/MotyaSS/DB_CW/pkg/entities"
 	"github.com/MotyaSS/DB_CW/pkg/httpError"
@@ -111,15 +112,12 @@ func (s *InstPostgres) CreateInstrument(instrument entity.Instrument) (id int, e
 		case strings.Contains(pqErr.Detail, "category_id"):
 			field = "category"
 			value = instrument.CategoryId
-			break
 		case strings.Contains(pqErr.Detail, "store_id"):
 			field = "store"
 			value = instrument.StoreId
-			break
 		case strings.Contains(pqErr.Detail, "manufacturer_id"):
 			field = "manufacturer"
 			value = instrument.ManufacturerId
-			break
 		}
 		return id, &httpError.ErrorWithStatusCode{
 			HTTPStatus: http.StatusNotFound,
@@ -128,11 +126,54 @@ func (s *InstPostgres) CreateInstrument(instrument entity.Instrument) (id int, e
 	}
 
 	slog.Error("unknown internal server error during creating instrument",
-		"err", pqErr.Message,
-	)
+		"err", pqErr.Message)
 
 	return id, &httpError.ErrorWithStatusCode{
 		HTTPStatus: http.StatusInternalServerError,
-		Msg:        fmt.Sprintf("internal server error during creating instrument"),
+		Msg:        "internal server error during creating instrument",
 	}
+}
+
+func (s *InstPostgres) GetActiveDiscount(instrumentId int) (*entity.Discount, error) {
+
+	var discount entity.Discount
+	query := fmt.Sprintf(`SELECT * FROM %s WHERE instrument_id = $1 AND valid_until > $2`, discountsTable)
+	err := s.db.Get(&discount, query, instrumentId, time.Now())
+
+	if err == nil {
+		return &discount, nil
+	}
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+
+	slog.Error("unknown internal server error during discount obtaining instrument",
+		"err", err.Error())
+	return nil, &httpError.ErrorWithStatusCode{
+		HTTPStatus: http.StatusInternalServerError,
+		Msg:        "internal server error during discount obtaining instrument",
+	}
+
+}
+
+func (s *InstPostgres) DeleteInstrument(id int) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE instrument_id = $1", instrumentsTable)
+	result, err := s.db.Exec(query, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return &httpError.ErrorWithStatusCode{
+			HTTPStatus: http.StatusNotFound,
+			Msg:        fmt.Sprintf("instrument with id %d not found", id),
+		}
+	}
+
+	return nil
 }

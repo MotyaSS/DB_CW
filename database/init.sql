@@ -28,9 +28,9 @@ CREATE TABLE categories
 CREATE TABLE manufacturers
 (
     manufacturer_id   SERIAL PRIMARY KEY,
-    manufacturer_name VARCHAR(255) NOT NULL,
-    description       TEXT
+    manufacturer_name VARCHAR(255) NOT NULL
 );
+
 CREATE TABLE instruments
 (
     instrument_id   SERIAL PRIMARY KEY,

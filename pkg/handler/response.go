@@ -28,5 +28,4 @@ func abortWithError(ctx *gin.Context, err error) {
 	} else {
 		abortWithStatusCode(ctx, http.StatusInternalServerError, err.Error())
 	}
-	return
 }

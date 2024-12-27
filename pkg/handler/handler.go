@@ -19,20 +19,20 @@ func New(service *service.Service) *Handler {
 
 func (h *Handler) InitRouter(middleware ...gin.HandlerFunc) *gin.Engine {
 	router := gin.Default()
-	apiRouter := router.Group("/api")
 	router.Use(middleware...)
-	router.GET("/", func(context *gin.Context) {
+	apiRouter := router.Group("/api")
+	apiRouter.GET("/", func(context *gin.Context) {
 		context.JSON(http.StatusOK, "welcome page")
 	})
-
 	// TODO: sign up for non-customers
 	//
 
 	auth := apiRouter.Group("/")
 	{
 		auth.POST("/sign-up", h.signUp)
-		auth.GET("/roles", h.userIdentity, h.getAllRoles)
 		auth.POST("/sign-in", h.signIn)
+		auth.GET("/roles", h.userIdentity, h.getAllRoles)
+		auth.POST("/sign-up-privileged", h.userIdentity, h.signUpPrivileged)
 	}
 
 	items := apiRouter.Group("/instruments")

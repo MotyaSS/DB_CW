@@ -22,13 +22,13 @@ func (f *InstFilter) AddManufacturer(manufacturer string) *InstFilter {
 	return f
 }
 
-func (f *InstFilter) AddPriceFloor(price *decimal.Decimal) *InstFilter {
-	f.PriceFloor = price
+func (f *InstFilter) AddPriceFloor(price decimal.Decimal) *InstFilter {
+	f.PriceFloor = &price
 	return f
 }
 
-func (f *InstFilter) AddPriceCeil(price *decimal.Decimal) *InstFilter {
-	f.PriceCeil = price
+func (f *InstFilter) AddPriceCeil(price decimal.Decimal) *InstFilter {
+	f.PriceCeil = &price
 	return f
 }
 

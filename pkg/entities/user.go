@@ -1,5 +1,12 @@
 package entity
 
+const (
+	RoleCustomerId = 1
+	RoleStaffId    = 2
+	RoleChiefId    = 3
+	RoleAdminId    = 4
+)
+
 type User struct {
 	UserId      int    `json:"user_id" db:"user_id"`
 	Username    string `json:"username" db:"username" binding:"required"`
