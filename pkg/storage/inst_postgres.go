@@ -52,16 +52,24 @@ func (s *InstPostgres) GetAllInstruments(filter entity.InstFilter) ([]entity.Ins
 	args := make([]interface{}, 0)
 	argId := 1
 
-	if filter.Category != nil {
-		query += fmt.Sprintf(" AND c.category_name = $%d", argId)
-		args = append(args, *filter.Category)
-		argId++
+	if len(filter.Categories) > 0 {
+		placeholders := make([]string, len(filter.Categories))
+		for i, category := range filter.Categories {
+			placeholders[i] = fmt.Sprintf("$%d", argId)
+			args = append(args, category)
+			argId++
+		}
+		query += fmt.Sprintf(" AND c.category_name = ANY(ARRAY[%s])", strings.Join(placeholders, ", "))
 	}
 
-	if filter.Manufacturer != nil {
-		query += fmt.Sprintf(" AND m.manufacturer_name = $%d", argId)
-		args = append(args, *filter.Manufacturer)
-		argId++
+	if len(filter.Manufacturers) > 0 {
+		placeholders := make([]string, len(filter.Manufacturers))
+		for i, manufacturer := range filter.Manufacturers {
+			placeholders[i] = fmt.Sprintf("$%d", argId)
+			args = append(args, manufacturer)
+			argId++
+		}
+		query += fmt.Sprintf(" AND m.manufacturer_name = ANY(ARRAY[%s])", strings.Join(placeholders, ", "))
 	}
 
 	if filter.PriceFloor != nil {

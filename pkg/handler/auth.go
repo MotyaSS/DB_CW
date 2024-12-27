@@ -36,7 +36,7 @@ func (h *Handler) signUp(ctx *gin.Context) {
 		Email:       input.Email,
 		PhoneNumber: input.PhoneNumber,
 		Password:    input.Password,
-		RoleId:      entity.RoleCustomerId,
+		RoleId:      entity.RoleCustomer.RoleId,
 	}
 
 	id, err := h.service.Authorisation.CreateCustomer(user)

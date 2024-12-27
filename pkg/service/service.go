@@ -10,6 +10,7 @@ type Authorisation interface {
 	GetUserRole(userId int) (entity.Role, error)
 	CreateUser(callerId int, user entity.User) (int, error)
 	CreateCustomer(user entity.User) (int, error)
+	HasPermission(userRole, requiredRole entity.Role) bool
 	GenerateToken(username, password string) (string, error)
 	ParseToken(token string) (int, error)
 }
@@ -25,6 +26,12 @@ type Instrument interface {
 	CreateInstrument(instrument entity.Instrument) (id int, err error)
 	GetActiveDiscount(instrumentId int) (*entity.Discount, error)
 	DeleteInstrument(callerId int, instrumentId int) error
+}
+
+type Repair interface {
+	GetRepair(callerId int, id int) (entity.Repair, error)
+	CreateRepair(callerId int, repair entity.Repair) (id int, err error)
+	GetInstrumentRepairs(callerId int, instrumentId int) ([]entity.Repair, error)
 }
 
 type Review interface {
@@ -52,6 +59,7 @@ type Service struct {
 	Review
 	Rent
 	Store
+	Repair
 }
 
 func New(storage *storage.Storage) *Service {

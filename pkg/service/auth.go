@@ -32,26 +32,26 @@ func NewAuthService(storage storage.Authorisation) *AuthService {
 	return &AuthService{storage: storage}
 }
 
-// hasPermission checks if the user role has sufficient permissions for the required role
-func hasPermission(userRole, requiredRole entity.Role) bool {
+// HasPermission checks if the user role has sufficient permissions for the required role
+func (s *AuthService) HasPermission(userRole, requiredRole entity.Role) bool {
 	// Admin has all permissions
-	if userRole.RoleId == entity.RoleAdminId {
+	if userRole.RoleId == entity.RoleAdmin.RoleId {
 		return true
 	}
 
 	// Chief can manage staff and customers
-	if userRole.RoleId == entity.RoleChiefId {
-		return requiredRole.RoleId <= entity.RoleChiefId
+	if userRole.RoleId == entity.RoleChief.RoleId {
+		return requiredRole.RoleId <= entity.RoleChief.RoleId
 	}
 
 	// Staff can manage customers
-	if userRole.RoleId == entity.RoleStaffId {
-		return requiredRole.RoleId <= entity.RoleStaffId
+	if userRole.RoleId == entity.RoleStaff.RoleId {
+		return requiredRole.RoleId <= entity.RoleStaff.RoleId
 	}
 
 	// Customers can only access customer-level permissions
-	if userRole.RoleId == entity.RoleCustomerId {
-		return requiredRole.RoleId == entity.RoleCustomerId
+	if userRole.RoleId == entity.RoleCustomer.RoleId {
+		return requiredRole.RoleId == entity.RoleCustomer.RoleId
 	}
 
 	return false
@@ -67,7 +67,7 @@ func (s *AuthService) CheckPermission(userId int, requiredRole entity.Role) erro
 		}
 	}
 
-	if !hasPermission(userRole, requiredRole) {
+	if !s.HasPermission(userRole, requiredRole) {
 		return &httpError.ErrorWithStatusCode{
 			HTTPStatus: http.StatusForbidden,
 			Msg:        "insufficient permissions",
@@ -94,17 +94,17 @@ func (s *AuthService) GetUserRole(userId int) (entity.Role, error) {
 
 func (s *AuthService) CreateCustomer(user entity.User) (int, error) {
 	user.Password = generatePasswordHash(user.Password)
-	if user.RoleId != entity.RoleCustomerId {
+	if user.RoleId != entity.RoleCustomer.RoleId {
 		slog.Info("Role mismatch: expected customer, got different. Created user with customer role", "role", user.RoleId)
 	}
-	user.RoleId = entity.RoleCustomerId
+	user.RoleId = entity.RoleCustomer.RoleId
 	return s.storage.CreateUser(user)
 }
 
 func (s *AuthService) CreateUser(callerId int, user entity.User) (int, error) {
 	// If callerId is -1, it means we're creating a customer account (self-registration)
 	if callerId == -1 {
-		if user.RoleId != entity.RoleCustomerId {
+		if user.RoleId != entity.RoleCustomer.RoleId {
 			return 0, &httpError.ErrorWithStatusCode{
 				HTTPStatus: http.StatusForbidden,
 				Msg:        "self-registration is only allowed for customer accounts",
@@ -121,7 +121,7 @@ func (s *AuthService) CreateUser(callerId int, user entity.User) (int, error) {
 	}
 
 	// Only admin can create admin accounts
-	if user.RoleId == entity.RoleAdminId && callerRole.RoleId != entity.RoleAdminId {
+	if user.RoleId == entity.RoleAdmin.RoleId && callerRole.RoleId != entity.RoleAdmin.RoleId {
 		return 0, &httpError.ErrorWithStatusCode{
 			HTTPStatus: http.StatusForbidden,
 			Msg:        "only admins can create admin accounts",
@@ -129,7 +129,7 @@ func (s *AuthService) CreateUser(callerId int, user entity.User) (int, error) {
 	}
 
 	// Chief and higher can create staff accounts
-	if user.RoleId == entity.RoleStaffId && callerRole.RoleId < entity.RoleChiefId {
+	if user.RoleId == entity.RoleStaff.RoleId && callerRole.RoleId < entity.RoleChief.RoleId {
 		return 0, &httpError.ErrorWithStatusCode{
 			HTTPStatus: http.StatusForbidden,
 			Msg:        "insufficient permissions to create staff accounts",
@@ -137,7 +137,7 @@ func (s *AuthService) CreateUser(callerId int, user entity.User) (int, error) {
 	}
 
 	// Only admin can create chief accounts
-	if user.RoleId == entity.RoleChiefId && callerRole.RoleId != entity.RoleAdminId {
+	if user.RoleId == entity.RoleChief.RoleId && callerRole.RoleId != entity.RoleAdmin.RoleId {
 		return 0, &httpError.ErrorWithStatusCode{
 			HTTPStatus: http.StatusForbidden,
 			Msg:        "only admins can create chief accounts",

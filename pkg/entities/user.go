@@ -1,12 +1,5 @@
 package entity
 
-const (
-	RoleCustomerId = 1
-	RoleStaffId    = 2
-	RoleChiefId    = 3
-	RoleAdminId    = 4
-)
-
 type User struct {
 	UserId      int    `json:"user_id" db:"user_id"`
 	Username    string `json:"username" db:"username" binding:"required"`
@@ -20,3 +13,10 @@ type Role struct {
 	RoleId   int    `json:"role_id" db:"role_id"`
 	RoleName string `json:"role_name" db:"role_name"`
 }
+
+var (
+	RoleCustomer Role = Role{1, "customer"}
+	RoleStaff         = Role{2, "Staff"}
+	RoleChief         = Role{3, "Chief"}
+	RoleAdmin         = Role{4, "Admin"}
+)

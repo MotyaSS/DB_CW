@@ -23,9 +23,9 @@ type Instrument interface {
 }
 
 type Review interface {
-	GetAllReviews() ([]entity.Review, error)
+	GetAllReviews(instrumentId int) ([]entity.Review, error)
 	GetReview(id int) (entity.Review, error)
-	CreateReview(callerId int, review []entity.Review) error
+	CreateReview(callerId int, review entity.Review) (int, error)
 	DeleteReview(callerId int, reviewId int) error
 }
 
@@ -52,6 +52,13 @@ type Storage struct {
 	Review
 	Rent
 	Store
+	Repair
+}
+
+type Repair interface {
+	GetRepair(id int) (entity.Repair, error)
+	CreateRepair(callerId int, repair entity.Repair) (id int, err error)
+	GetInstrumentRepairs(instrumentId int) ([]entity.Repair, error)
 }
 
 func New(db *sqlx.DB) *Storage {
@@ -60,5 +67,6 @@ func New(db *sqlx.DB) *Storage {
 		Instrument:    newInstPostgres(db),
 		Rent:          newRentPostgres(db),
 		Store:         newStorePostgres(db),
+		Repair:        NewRepairPostgres(db),
 	}
 }
