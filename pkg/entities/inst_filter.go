@@ -5,20 +5,26 @@ import (
 )
 
 type InstFilter struct {
-	Category     *string
-	Manufacturer *string
-	PriceFloor   *decimal.Decimal
-	PriceCeil    *decimal.Decimal
-	Page         int
+	Categories    []string
+	Manufacturers []string
+	PriceFloor    *decimal.Decimal
+	PriceCeil     *decimal.Decimal
+	Page          int
 }
 
 func (f *InstFilter) AddCategory(category string) *InstFilter {
-	f.Category = &category
+	if f.Categories == nil {
+		f.Categories = make([]string, 0)
+	}
+	f.Categories = append(f.Categories, category)
 	return f
 }
 
 func (f *InstFilter) AddManufacturer(manufacturer string) *InstFilter {
-	f.Manufacturer = &manufacturer
+	if f.Manufacturers == nil {
+		f.Manufacturers = make([]string, 0)
+	}
+	f.Manufacturers = append(f.Manufacturers, manufacturer)
 	return f
 }
 

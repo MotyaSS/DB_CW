@@ -62,7 +62,7 @@ func (s *InstService) DeleteInstrument(callerId int, instrumentId int) error {
 		return err
 	}
 
-	if userRole.RoleId < entity.RoleStaffId {
+	if !s.auth.HasPermission(userRole, entity.Role{RoleId: entity.RoleStaff.RoleId}) {
 		return &httpError.ErrorWithStatusCode{
 			HTTPStatus: http.StatusForbidden,
 			Msg:        "insufficient  permissions to delete instruments",

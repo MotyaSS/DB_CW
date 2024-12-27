@@ -31,7 +31,7 @@ func (h *Handler) InitRouter(middleware ...gin.HandlerFunc) *gin.Engine {
 	{
 		auth.POST("/sign-up", h.signUp)
 		auth.POST("/sign-in", h.signIn)
-		auth.GET("/roles", h.userIdentity, h.getAllRoles)
+		auth.GET("/roles", h.getAllRoles)
 		auth.POST("/sign-up-privileged", h.userIdentity, h.signUpPrivileged)
 	}
 
@@ -45,11 +45,11 @@ func (h *Handler) InitRouter(middleware ...gin.HandlerFunc) *gin.Engine {
 			item.POST("/rent", h.userIdentity, h.rentInstrument)
 			item.GET("/", h.getInstrument)
 			item.DELETE("/", h.userIdentity, h.deleteInstrument)
-			repairment := item.Group("/repair")
+			repairment := item.Group("/repairments")
 			{
 				repairment.POST("/", h.userIdentity, h.createRepair)
 				repairment.GET("/", h.getAllRepairs)
-				repairment.GET("/:repair_id", h.getRepair)
+				repairment.GET("/:repairment_id", h.getRepair)
 			}
 			reviews := item.Group("/reviews")
 			{

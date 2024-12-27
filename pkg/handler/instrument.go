@@ -14,39 +14,44 @@ import (
 
 func setupInstFilter(ctx *gin.Context) (entity.InstFilter, error) {
 	var f entity.InstFilter
-	param, exists := ctx.GetQuery("category")
-	if exists {
-		f.AddCategory(param)
-	}
-	param, exists = ctx.GetQuery("manufacturer")
-	if exists {
-		f.AddManufacturer(param)
+
+	// Handle multiple categories
+	categories := ctx.QueryArray("category")
+	for _, category := range categories {
+		f.AddCategory(category)
 	}
 
-	param = ctx.DefaultQuery("page", "1")
+	// Handle multiple manufacturers
+	manufacturers := ctx.QueryArray("manufacturer")
+	for _, manufacturer := range manufacturers {
+		f.AddManufacturer(manufacturer)
+	}
+
+	// Handle price floor
+	if priceFloor := ctx.Query("price_floor"); priceFloor != "" {
+		price, err := decimal.NewFromString(priceFloor)
+		if err != nil {
+			return f, fmt.Errorf("incorrect price_floor format")
+		}
+		f.AddPriceFloor(price)
+	}
+
+	// Handle price ceiling
+	if priceCeil := ctx.Query("price_ceil"); priceCeil != "" {
+		price, err := decimal.NewFromString(priceCeil)
+		if err != nil {
+			return f, fmt.Errorf("incorrect price_ceil format")
+		}
+		f.AddPriceCeil(price)
+	}
+
+	// Handle pagination
+	param := ctx.DefaultQuery("page", "1")
 	page, err := strconv.Atoi(param)
 	if err != nil {
 		return f, fmt.Errorf("incorrect page format")
 	}
 	f.AddPage(page)
-
-	param, exists = ctx.GetQuery("floor")
-	if exists {
-		d, err := decimal.NewFromString(param)
-		if err != nil {
-			return f, fmt.Errorf("incorrect price format")
-		}
-		f.AddPriceFloor(d)
-	}
-
-	param, exists = ctx.GetQuery("ceil")
-	if exists {
-		d, err := decimal.NewFromString(param)
-		if err != nil {
-			return f, fmt.Errorf("incorrect price format")
-		}
-		f.AddPriceCeil(d)
-	}
 
 	return f, nil
 }
