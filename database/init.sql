@@ -8,8 +8,8 @@ CREATE TABLE users
     user_id       SERIAL PRIMARY KEY,
     username      VARCHAR(255) UNIQUE NOT NULL,
     email         VARCHAR(255) UNIQUE NOT NULL,
-    phone_number  VARCHAR(20),
-    password_hash CHAR(256),
+    phone_number  VARCHAR(32)         NOT NULL,
+    password_hash VARCHAR(255)        NOT NULL,
     role_id       INT                 NOT NULL REFERENCES roles (role_id)
 );
 CREATE TABLE stores
@@ -28,9 +28,9 @@ CREATE TABLE categories
 CREATE TABLE manufacturers
 (
     manufacturer_id   SERIAL PRIMARY KEY,
-    manufacturer_name VARCHAR(255) NOT NULL,
-    description       TEXT
+    manufacturer_name VARCHAR(255) NOT NULL
 );
+
 CREATE TABLE instruments
 (
     instrument_id   SERIAL PRIMARY KEY,
@@ -44,8 +44,8 @@ CREATE TABLE instruments
 CREATE TABLE rentals
 (
     rental_id     SERIAL PRIMARY KEY,
-    user_id       INT  NOT NULL REFERENCES users (user_id),
-    instrument_id INT  NOT NULL REFERENCES instruments (instrument_id),
+    user_id       INT       NOT NULL REFERENCES users (user_id),
+    instrument_id INT       NOT NULL REFERENCES instruments (instrument_id),
     rental_date   TIMESTAMP NOT NULL,
     return_date   TIMESTAMP
 );
@@ -59,7 +59,7 @@ CREATE TABLE payments
 CREATE TABLE repairs
 (
     repair_id         SERIAL PRIMARY KEY,
-    instrument_id     INT  NOT NULL REFERENCES instruments (instrument_id),
+    instrument_id     INT       NOT NULL REFERENCES instruments (instrument_id),
     repair_start_date TIMESTAMP NOT NULL,
     repair_end_date   TIMESTAMP NOT NULL,
     repair_cost       DECIMAL(10, 2) CHECK (repair_cost >= 0),
@@ -68,7 +68,7 @@ CREATE TABLE repairs
 CREATE TABLE discounts
 (
     discount_id         SERIAL PRIMARY KEY,
-    instrument_id       INT  NOT NULL REFERENCES instruments (instrument_id),
+    instrument_id       INT       NOT NULL REFERENCES instruments (instrument_id),
     discount_percentage DECIMAL(5, 2) CHECK (discount_percentage BETWEEN 0 AND 100),
     valid_until         TIMESTAMP NOT NULL
 );
@@ -79,10 +79,12 @@ CREATE TABLE reviews
     review_text TEXT,
     rating      INT CHECK (rating BETWEEN 1 AND 5)
 );
+
 -- Добавляем роли пользователей
 INSERT INTO roles (role_name)
 VALUES ('customer'),
        ('staff'),
+       ('chief'),
        ('admin');
 
 -- Добавляем магазины

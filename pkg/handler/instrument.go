@@ -1,53 +1,154 @@
 package handler
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
+	"strconv"
 
+	entity "github.com/MotyaSS/DB_CW/pkg/entities"
+	"github.com/MotyaSS/DB_CW/pkg/httpError"
 	"github.com/gin-gonic/gin"
+	"github.com/shopspring/decimal"
 )
 
-func (*Handler) getAllInstruments(ctx *gin.Context) {
-	categ, exists := ctx.GetQuery("category")
-	response := "all instruments"
+func setupInstFilter(ctx *gin.Context) (entity.InstFilter, error) {
+	var f entity.InstFilter
+	param, exists := ctx.GetQuery("category")
 	if exists {
-		response += " of category " + categ
+		f.AddCategory(param)
+	}
+	param, exists = ctx.GetQuery("manufacturer")
+	if exists {
+		f.AddManufacturer(param)
+	}
+
+	param = ctx.DefaultQuery("page", "1")
+	page, err := strconv.Atoi(param)
+	if err != nil {
+		return f, fmt.Errorf("incorrect page format")
+	}
+	f.AddPage(page)
+
+	param, exists = ctx.GetQuery("floor")
+	if exists {
+		d, err := decimal.NewFromString(param)
+		if err != nil {
+			return f, fmt.Errorf("incorrect price format")
+		}
+		f.AddPriceFloor(d)
+	}
+
+	param, exists = ctx.GetQuery("ceil")
+	if exists {
+		d, err := decimal.NewFromString(param)
+		if err != nil {
+			return f, fmt.Errorf("incorrect price format")
+		}
+		f.AddPriceCeil(d)
+	}
+
+	return f, nil
+}
+
+func (h *Handler) getAllInstruments(ctx *gin.Context) {
+	// TODO: should return instruments with discount if exists
+	filter, err := setupInstFilter(ctx)
+	if err != nil {
+		httpErr := &httpError.ErrorWithStatusCode{}
+		ok := errors.As(err, &httpErr)
+		if ok {
+			abortWithStatusCode(ctx, httpErr.HTTPStatus, httpErr.Msg)
+		} else {
+			abortWithStatusCode(ctx, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	res, err := h.service.Instrument.GetAllInstruments(filter)
+	if err != nil {
+		abortWithError(ctx, err)
+		return
 	}
 	ctx.JSON(
 		http.StatusOK,
-		response,
+		gin.H{"items": res},
 	)
 }
 
-func (*Handler) getInstrument(ctx *gin.Context) {
+func (h *Handler) getInstrument(ctx *gin.Context) {
+	// TODO: should return instrument with discount if exists
+	id, err := strconv.Atoi(ctx.Param("inst_id"))
+	if err != nil {
+		abortWithError(ctx, err)
+	}
+	inst, err := h.service.Instrument.GetInstrument(id)
+	if err != nil {
+		abortWithError(ctx, err)
+		return
+	}
 	ctx.JSON(
 		http.StatusOK,
-		[]string{
-			"instrument number ",
-			ctx.Param("inst_id"),
-		},
+		inst,
 	)
 }
 
-func (*Handler) addInstrument(ctx *gin.Context) {
-	ctx.JSON(
-		http.StatusCreated,
-		"instrument added",
-	)
-}
-
-func (*Handler) deleteInstrument(ctx *gin.Context) {
-	ctx.JSON(
-		http.StatusOK,
-		[]string{
-			"instrument deleted",
-			ctx.Param("inst_id"),
-		},
-	)
-}
-
-func (*Handler) rentInstrument(ctx *gin.Context) {
+func (h *Handler) createInstrument(ctx *gin.Context) {
+	var inst entity.Instrument
+	if err := ctx.BindJSON(&inst); err != nil {
+		abortWithError(ctx, err)
+		return
+	}
+	id, err := h.service.Instrument.CreateInstrument(inst)
+	if err != nil {
+		abortWithError(ctx, err)
+		return
+	}
 	ctx.JSON(
 		http.StatusOK,
-		"instrument rented",
+		gin.H{"id": id},
+	)
+}
+
+func (h *Handler) deleteInstrument(ctx *gin.Context) {
+	callerId, err := h.getCallerId(ctx)
+	if err != nil {
+		abortWithError(ctx, err)
+		return
+	}
+	instId, err := strconv.Atoi(ctx.Param("inst_id"))
+	if err != nil {
+		abortWithError(ctx, err)
+		return
+	}
+	err = h.service.Instrument.DeleteInstrument(callerId, instId)
+	if err != nil {
+		abortWithError(ctx, err)
+		return
+	}
+	ctx.JSON(
+		http.StatusNoContent, nil,
+	)
+}
+
+func (h *Handler) rentInstrument(ctx *gin.Context) {
+	callerId, err := h.getCallerId(ctx)
+	if err != nil {
+		abortWithError(ctx, err)
+		return
+	}
+	instId, err := strconv.Atoi(ctx.Param("inst_id"))
+	if err != nil {
+		abortWithError(ctx, err)
+		return
+	}
+	id, err := h.service.Rent.CreateRental(callerId, instId)
+	if err != nil {
+		abortWithError(ctx, err)
+		return
+	}
+	ctx.JSON(
+		http.StatusOK,
+		gin.H{"id": id},
 	)
 }

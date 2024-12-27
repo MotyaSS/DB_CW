@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (*Handler) getReviews(ctx *gin.Context) {
+func (*Handler) getAllReviews(ctx *gin.Context) {
 	ctx.JSON(
 		http.StatusOK,
 		[]string{

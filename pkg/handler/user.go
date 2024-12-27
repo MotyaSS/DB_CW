@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (*Handler) getUsers(ctx *gin.Context) {
+func (*Handler) getAllUsers(ctx *gin.Context) {
 	ctx.JSON(
 		http.StatusOK,
 		"all users",

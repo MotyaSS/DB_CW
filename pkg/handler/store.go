@@ -6,14 +6,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (*Handler) getAllStores(ctx *gin.Context) {
+func (h *Handler) getAllStores(ctx *gin.Context) {
+	stores, err := h.service.Store.GetAllStores()
+
+	if err != nil {
+		abortWithError(ctx, err)
+		return
+	}
+
 	ctx.JSON(
 		http.StatusOK,
-		"all stores",
+		stores,
 	)
 }
 
-func (*Handler) getStore(ctx *gin.Context) {
+func (h *Handler) getStore(ctx *gin.Context) {
 	ctx.JSON(
 		http.StatusOK,
 		[]string{
@@ -23,14 +30,14 @@ func (*Handler) getStore(ctx *gin.Context) {
 	)
 }
 
-func (*Handler) createStore(ctx *gin.Context) {
+func (h *Handler) createStore(ctx *gin.Context) {
 	ctx.JSON(
 		http.StatusCreated,
 		"store created",
 	)
 }
 
-func (*Handler) deleteStore(ctx *gin.Context) {
+func (h *Handler) deleteStore(ctx *gin.Context) {
 	ctx.JSON(
 		http.StatusCreated,
 		[]string{

@@ -1,32 +1,64 @@
 package storage
 
-type Authorisation interface {
-}
+import (
+	entity "github.com/MotyaSS/DB_CW/pkg/entities"
+	"github.com/jmoiron/sqlx"
+)
 
-type User interface {
+type Authorisation interface {
+	CreateUser(user entity.User) (int, error)
+	GetUser(username, password string) (entity.User, error)
+	GetRole(roleId int) (entity.Role, error)
+	GetRoleId(roleName string) (int, error)
+	GetAllRoles() ([]entity.Role, error)
+	GetUserRole(userId int) (entity.Role, error)
 }
 
 type Instrument interface {
+	GetInstrument(id int) (entity.Instrument, error)
+	GetAllInstruments(filter entity.InstFilter) ([]entity.Instrument, error)
+	CreateInstrument(entity.Instrument) (id int, err error)
+	GetActiveDiscount(instrumentId int) (*entity.Discount, error)
+	DeleteInstrument(id int) error
 }
 
 type Review interface {
+	GetAllReviews() ([]entity.Review, error)
+	GetReview(id int) (entity.Review, error)
+	CreateReview(callerId int, review []entity.Review) error
+	DeleteReview(callerId int, reviewId int) error
 }
 
 type Rent interface {
+	CreateRental(rental entity.Rental) (int, error)
+	GetRental(id int) (entity.Rental, error)
+	GetUserRentals(userId int) ([]entity.Rental, error)
+	GetInstrumentRentals(instrumentId int) ([]entity.Rental, error)
+	UpdateRental(rental entity.Rental) error
+	DeleteRental(id int) error
+	ReturnInstrument(rentalId int) error
 }
 
 type Store interface {
+	GetAllStores() ([]entity.Store, error)
+	GetStore(id int) (entity.Store, error)
+	CreateStore(store entity.Store) (int, error)
+	DeleteStore(id int) error
 }
 
 type Storage struct {
 	Authorisation
-	User
 	Instrument
 	Review
 	Rent
 	Store
 }
 
-func New() *Storage {
-	return &Storage{}
+func New(db *sqlx.DB) *Storage {
+	return &Storage{
+		Authorisation: NewAuthPostgres(db),
+		Instrument:    newInstPostgres(db),
+		Rent:          newRentPostgres(db),
+		Store:         newStorePostgres(db),
+	}
 }

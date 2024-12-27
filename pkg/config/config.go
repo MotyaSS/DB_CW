@@ -20,9 +20,12 @@ type HttpServer struct {
 }
 
 type Database struct {
-	Address  string `yaml:"address" env-required:"true"`
+	Host     string `yaml:"host" env-required:"true"`
+	Port     string `yaml:"port" env-required:"true"`
 	Username string `yaml:"username" env-required:"true"`
-	Password string `yaml:"password" env-required:"true"`
+	Password string //configured through .env
+	DBName   string `yaml:"dbname" env-required:"true"`
+	SSLMode  string `yaml:"sslmode" env-required:"true"`
 }
 
 func LoadConfig() (*Config, error) {
@@ -38,5 +41,10 @@ func LoadConfig() (*Config, error) {
 	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
 		return nil, fmt.Errorf("error occured while reading config: %s", err.Error())
 	}
+	password, exists := os.LookupEnv("POSTGRES_PASSWORD")
+	if !exists {
+		return nil, fmt.Errorf("POSTGRES_PASSWORD is not set")
+	}
+	cfg.Database.Password = password
 	return &cfg, nil
 }
