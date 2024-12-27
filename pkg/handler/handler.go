@@ -24,8 +24,7 @@ func (h *Handler) InitRouter(middleware ...gin.HandlerFunc) *gin.Engine {
 	apiRouter.GET("/", func(context *gin.Context) {
 		context.JSON(http.StatusOK, "welcome page")
 	})
-	// TODO: sign up for non-customers
-	//
+
 
 	auth := apiRouter.Group("/")
 	{

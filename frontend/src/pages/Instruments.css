@@ -1,0 +1,63 @@
+.instruments-page {
+    padding: 2rem 0;
+}
+
+.instruments-filters {
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-input,
+.filter-select {
+    padding: 0.75rem;
+    border: 1px solid #3a4255;
+    border-radius: 4px;
+    background-color: #2a3142;
+    color: white;
+    font-size: 1rem;
+    min-width: 200px;
+}
+
+.filter-input:focus,
+.filter-select:focus {
+    outline: none;
+    border-color: #64b5f6;
+}
+
+.instruments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.instruments-loading,
+.instruments-error,
+.instruments-empty {
+    text-align: center;
+    padding: 2rem;
+    color: #8b95aa;
+    font-size: 1.1rem;
+}
+
+.instruments-error {
+    color: #ff6b6b;
+}
+
+@media (max-width: 768px) {
+    .instruments-filters {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .filter-input,
+    .filter-select {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .instruments-grid {
+        gap: 1rem;
+    }
+} 
