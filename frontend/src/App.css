@@ -52,23 +52,71 @@
 }
 
 .app-header {
-  width: 100%;
-  background-color: #1a1f2e;
+  padding: 1rem;
+  background-color: #1a1a1a;
   color: white;
-  border-bottom: 1px solid #3a4255;
 }
 
 .app-main {
   flex: 1;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 2rem;
 }
 
-/* Медиа-запросы для адаптивности */
-@media (max-width: 768px) {
-  .app-main {
-    padding: 1rem;
-  }
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  text-align: center;
+  padding: 2rem;
+  position: relative;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 0;
+}
+
+.home h1,
+.home p,
+.home-actions {
+  position: relative;
+  z-index: 1;
+}
+
+.home h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+.home p {
+  font-size: 1.2rem;
+  color: #8b95a9;
+  margin-bottom: 2rem;
+}
+
+.home-actions {
+  margin-top: 2rem;
+}
+
+.cta-button {
+  display: inline-block;
+  background-color: #646cff;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.cta-button:hover {
+  background-color: #535bf2;
 }

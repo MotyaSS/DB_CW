@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -28,12 +29,12 @@ func New(addr string, timeout time.Duration, handler http.Handler) *Server {
 func (s *Server) Run() {
 	slog.Info("Server started at", "address", s.httpServer.Addr)
 	go func() {
-		quit := make(chan os.Signal)
-		signal.Notify(quit)
+		quit := make(chan os.Signal, 1)
+		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 		<-quit
-		log.Println("Interrupted by Ctrl+C")
+		slog.Info("Interrupted by Ctrl+C")
 		if err := s.Shutdown(); err != nil {
-			log.Fatal("Server Closed:", err)
+			slog.Error("Server Closed:", "msg", err.Error())
 		}
 	}()
 	if err := s.httpServer.ListenAndServe(); err != nil {

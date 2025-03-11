@@ -12,6 +12,9 @@ type Authorisation interface {
 	GetRoleId(roleName string) (int, error)
 	GetAllRoles() ([]entity.Role, error)
 	GetUserRole(userId int) (entity.Role, error)
+	GetAllUsers() ([]entity.User, error)
+	GetUserById(userId int) (entity.User, error)
+	DeleteUser(userId int) error
 }
 
 type Instrument interface {
@@ -20,6 +23,10 @@ type Instrument interface {
 	CreateInstrument(entity.Instrument) (id int, err error)
 	GetActiveDiscount(instrumentId int) (*entity.Discount, error)
 	DeleteInstrument(id int) error
+	GetCategories() ([]entity.Category, error)
+	GetManufacturers() ([]entity.Manufacturer, error)
+	CreateCategory(category entity.Category) (int, error)
+	CreateManufacturer(manufacturer entity.Manufacturer) (int, error)
 }
 
 type Review interface {
@@ -68,5 +75,6 @@ func New(db *sqlx.DB) *Storage {
 		Rent:          newRentPostgres(db),
 		Store:         newStorePostgres(db),
 		Repair:        NewRepairPostgres(db),
+		Review:        newReviewPostgres(db),
 	}
 }

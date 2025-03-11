@@ -1,102 +1,56 @@
 import { useState, useEffect } from 'react'
-import { apiClient } from '../api/client'
+import { useSearchParams } from 'react-router-dom'
 import InstrumentCard from '../components/InstrumentCard/InstrumentCard'
+import InstrumentFilters from '../components/InstrumentFilters/InstrumentFilters'
+import axios from 'axios'
 import './Instruments.css'
 
 export default function Instruments() {
     const [instruments, setInstruments] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
-    const [filters, setFilters] = useState({
-        search: '',
-        category: '',
-        status: '',
-        priceRange: [0, 10000]
-    })
+    const [searchParams] = useSearchParams()
 
     useEffect(() => {
         fetchInstruments()
-    }, [])
+    }, [searchParams])
 
     const fetchInstruments = async () => {
         try {
-            setLoading(true)
-            const response = await apiClient.get('/api/instruments')
-            setInstruments(response.data)
+            const response = await axios.get('http://localhost:8080/api/instruments', {
+                params: Object.fromEntries(searchParams)
+            })
+            setInstruments(response.data.items || [])
         } catch (err) {
-            setError('Не удалось загрузить инструменты')
-            console.error('Error fetching instruments:', err)
+            setError(err.response?.data?.message || 'Ошибка при загрузке инструментов')
         } finally {
             setLoading(false)
         }
     }
 
-    const handleFilterChange = (e) => {
-        const { name, value } = e.target
-        setFilters(prev => ({
-            ...prev,
-            [name]: value
-        }))
+    const handleFilterChange = (filters) => {
+        // Фильтры обновляются через URL параметры
+        // Это вызовет повторный запрос через useEffect
     }
 
-    const filteredInstruments = instruments.filter(instrument => {
-        return instrument.name.toLowerCase().includes(filters.search.toLowerCase()) &&
-            (filters.category === '' || instrument.category === filters.category) &&
-            (filters.status === '' || instrument.status === filters.status) &&
-            instrument.price >= filters.priceRange[0] &&
-            instrument.price <= filters.priceRange[1]
-    })
-
-    if (loading) return <div className="instruments-loading">Загрузка...</div>
-    if (error) return <div className="instruments-error">{error}</div>
+    if (loading) return <div className="loading">Загрузка...</div>
+    if (error) return <div className="error-message">{error}</div>
 
     return (
         <div className="instruments-page">
-            <div className="instruments-filters">
-                <input
-                    type="text"
-                    name="search"
-                    placeholder="Поиск инструментов..."
-                    value={filters.search}
-                    onChange={handleFilterChange}
-                    className="filter-input"
-                />
-                <select
-                    name="category"
-                    value={filters.category}
-                    onChange={handleFilterChange}
-                    className="filter-select"
-                >
-                    <option value="">Все категории</option>
-                    <option value="string">Струнные</option>
-                    <option value="wind">Духовые</option>
-                    <option value="percussion">Ударные</option>
-                </select>
-                <select
-                    name="status"
-                    value={filters.status}
-                    onChange={handleFilterChange}
-                    className="filter-select"
-                >
-                    <option value="">Все статусы</option>
-                    <option value="available">Доступные</option>
-                    <option value="rented">Арендованные</option>
-                </select>
-            </div>
-
-            <div className="instruments-grid">
-                {filteredInstruments.length > 0 ? (
-                    filteredInstruments.map(instrument => (
-                        <InstrumentCard 
-                            key={instrument.id} 
+            <h1>Доступные инструменты</h1>
+            <div className="instruments-layout">
+                <aside className="instruments-filters">
+                    <InstrumentFilters onFilterChange={handleFilterChange} />
+                </aside>
+                <div className="instruments-grid">
+                    {instruments.map(instrument => (
+                        <InstrumentCard
+                            key={instrument.instrument_id}
                             instrument={instrument}
                         />
-                    ))
-                ) : (
-                    <div className="instruments-empty">
-                        Инструменты не найдены
-                    </div>
-                )}
+                    ))}
+                </div>
             </div>
         </div>
     )

@@ -103,3 +103,19 @@ func (h *Handler) signIn(ctx *gin.Context) {
 			"token": token,
 		})
 }
+
+func (h *Handler) getCurrentUser(c *gin.Context) {
+	userId, err := h.getCallerId(c)
+	if err != nil {
+		abortWithError(c, err)
+		return
+	}
+
+	user, err := h.service.Authorisation.GetUserById(userId)
+	if err != nil {
+		abortWithError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}

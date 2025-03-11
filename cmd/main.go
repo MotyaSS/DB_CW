@@ -12,6 +12,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// 071ge87tadv123
 func main() {
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
 	err := godotenv.Load(".env")
@@ -35,6 +36,7 @@ func main() {
 		os.Exit(1)
 	}
 	storage := strg.New(db)
+
 	service := srvc.New(storage)
 	handler := hnd.New(service)
 	server := srvr.New(

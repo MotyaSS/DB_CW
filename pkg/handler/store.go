@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,13 +22,17 @@ func (h *Handler) getAllStores(ctx *gin.Context) {
 }
 
 func (h *Handler) getStore(ctx *gin.Context) {
-	ctx.JSON(
-		http.StatusOK,
-		[]string{
-			"store ",
-			ctx.Param("store_id"),
-		},
-	)
+	storeId, err := strconv.Atoi(ctx.Param("store_id"))
+	if err != nil {
+		abortWithError(ctx, err)
+		return
+	}
+	store, err := h.service.Store.GetStore(storeId)
+	if err != nil {
+		abortWithError(ctx, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, store)
 }
 
 func (h *Handler) createStore(ctx *gin.Context) {

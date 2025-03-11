@@ -17,7 +17,7 @@ const (
 	rentalsTable       = "rentals"
 	paymentsTable      = "payments"
 	repairsTable       = "repairs"
-	discountsTable     = "repairs"
+	discountsTable     = "discounts"
 	reviewsTable       = "reviews"
 )
 

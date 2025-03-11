@@ -2,91 +2,63 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    width: 100%;
 }
 
 .layout-header {
-    background-color: #1a1f2e;
-    padding: 0.5rem 1rem;
-    border-bottom: 1px solid #3a4255;
+    background-color: #1a1a1a;
+    padding: 1rem;
 }
 
 .layout-nav {
     max-width: 1200px;
     margin: 0 auto;
     display: flex;
-    gap: 1rem;
+    gap: 2rem;
     align-items: center;
-    flex-wrap: wrap;
-    padding: 0.5rem;
 }
 
 .layout-nav a {
-    color: #8b95aa;
+    color: white;
     text-decoration: none;
     padding: 0.5rem 1rem;
     border-radius: 4px;
-    transition: all 0.3s ease;
 }
 
 .layout-nav a:hover {
-    background-color: #2a3142;
-    color: #64b5f6;
+    background-color: #333;
 }
 
 .layout-nav a.active {
-    background-color: #2a3142;
-    color: #64b5f6;
+    background-color: #444;
 }
 
 .layout-main {
     flex: 1;
-    width: 100%;
+    padding: 2rem;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem 1rem;
+    width: 100%;
 }
 
 .layout-nav button {
     background: none;
-    border: 1px solid #64b5f6;
-    color: #64b5f6;
+    border: 1px solid white;
+    color: white;
     padding: 0.5rem 1rem;
     border-radius: 4px;
     cursor: pointer;
-    transition: all 0.3s ease;
 }
 
 .layout-nav button:hover {
-    background-color: #64b5f6;
-    color: white;
+    background-color: #333;
 }
 
-/* Медиа-запросы для адаптивности */
-@media (max-width: 768px) {
-    .layout-nav {
-        justify-content: center;
-        gap: 0.5rem;
-    }
-    
-    .layout-nav a {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.9rem;
-    }
-    
-    .layout-main {
-        padding: 1rem;
-    }
+.auth-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
-@media (max-width: 480px) {
-    .layout-nav {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .layout-nav a, 
-    .layout-nav button {
-        text-align: center;
-    }
+.username {
+    color: #8b95a9;
 }

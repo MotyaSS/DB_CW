@@ -157,3 +157,70 @@ func (h *Handler) rentInstrument(ctx *gin.Context) {
 		gin.H{"id": id},
 	)
 }
+
+func (h *Handler) getCategories(c *gin.Context) {
+	categories, err := h.service.Instrument.GetCategories()
+	if err != nil {
+		abortWithError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, categories)
+}
+
+func (h *Handler) getManufacturers(c *gin.Context) {
+	manufacturers, err := h.service.Instrument.GetManufacturers()
+	if err != nil {
+		abortWithError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, manufacturers)
+}
+
+func (h *Handler) createCategory(c *gin.Context) {
+	var category entity.Category
+	if err := c.BindJSON(&category); err != nil {
+		abortWithError(c, err)
+		return
+	}
+	callerId, err := h.getCallerId(c)
+	if err != nil {
+		abortWithError(c, err)
+		return
+	}
+	
+	id, err := h.service.Instrument.CreateCategory(callerId, category)
+	if err != nil {
+		abortWithError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"id": id,
+	})
+}
+
+func (h *Handler) createManufacturer(c *gin.Context) {
+	var manufacturer entity.Manufacturer
+	if err := c.BindJSON(&manufacturer); err != nil {
+		abortWithError(c, err)
+		return
+	}
+
+	callerId, err := h.getCallerId(c)
+	if err != nil {
+		abortWithError(c, err)
+		return
+	}
+
+	id, err := h.service.Instrument.CreateManufacturer(callerId, manufacturer)
+	if err != nil {
+		abortWithError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"id": id,
+	})
+}

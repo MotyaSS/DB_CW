@@ -1,0 +1,85 @@
+.instrument-details {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.instrument-details-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    background: #1a1f2e;
+    padding: 2rem;
+    border-radius: 8px;
+}
+
+.instrument-image-large {
+    width: 100%;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.instrument-image-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.instrument-info-detailed {
+    display: flex;
+    flex-direction: column;
+}
+
+.instrument-info-detailed h1 {
+    color: #ffffff;
+    margin-bottom: 1rem;
+}
+
+.description {
+    color: #8b95a9;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.price-section {
+    margin-bottom: 2rem;
+}
+
+.price {
+    color: #646cff;
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.discount {
+    display: inline-block;
+    background: #4caf5020;
+    color: #4caf50;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.rent-button {
+    background: #646cff;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: auto;
+}
+
+.rent-button:hover {
+    background: #535bf2;
+}
+
+@media (max-width: 768px) {
+    .instrument-details-content {
+        grid-template-columns: 1fr;
+    }
+}

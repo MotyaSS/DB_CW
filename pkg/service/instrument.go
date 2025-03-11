@@ -1,6 +1,7 @@
 package service
 
 import (
+	"log/slog"
 	"net/http"
 
 	entity "github.com/MotyaSS/DB_CW/pkg/entities"
@@ -77,4 +78,51 @@ func (s *InstService) DeleteInstrument(callerId int, instrumentId int) error {
 
 	// Delete the instrument
 	return s.storage.DeleteInstrument(instrumentId)
+}
+
+func (s *InstService) GetCategories() ([]entity.Category, error) {
+	return s.storage.GetCategories()
+}
+
+func (s *InstService) GetManufacturers() ([]entity.Manufacturer, error) {
+	return s.storage.GetManufacturers()
+}
+
+func (s *InstService) CreateCategory(callerId int, category entity.Category) (int, error) {
+	user, err := s.auth.GetUserById(callerId)
+	if err != nil {
+		return 0, err
+	}
+	slog.Info("user", "user", user)
+	userRole, err := s.auth.GetRole(user.RoleId)
+	slog.Info("userRole", "userRole", userRole)	
+	if err != nil {
+		return 0, err
+	}
+
+	if !s.auth.HasPermission(userRole, entity.RoleChief) {
+		return 0, &httpError.ErrorWithStatusCode{
+			HTTPStatus: http.StatusForbidden,
+			Msg:        "недостаточно прав для создания категорий",
+		}
+	}
+
+	return s.storage.CreateCategory(category)
+}
+
+func (s *InstService) CreateManufacturer(callerId int, manufacturer entity.Manufacturer) (int, error) {
+	// Проверяем права (должен быть Chief или выше)
+	userRole, err := s.auth.GetUserRole(callerId)
+	if err != nil {
+		return 0, err
+	}
+
+	if !s.auth.HasPermission(userRole, entity.RoleChief) {
+		return 0, &httpError.ErrorWithStatusCode{
+			HTTPStatus: http.StatusForbidden,
+			Msg:        "недостаточно прав для создания производителей",
+		}
+	}
+
+	return s.storage.CreateManufacturer(manufacturer)
 }

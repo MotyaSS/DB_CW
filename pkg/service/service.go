@@ -7,12 +7,17 @@ import (
 
 type Authorisation interface {
 	GetAllRoles() ([]entity.Role, error)
+	GetRole(roleId int) (entity.Role, error)
 	GetUserRole(userId int) (entity.Role, error)
 	CreateUser(callerId int, user entity.User) (int, error)
 	CreateCustomer(user entity.User) (int, error)
 	HasPermission(userRole, requiredRole entity.Role) bool
 	GenerateToken(username, password string) (string, error)
 	ParseToken(token string) (int, error)
+	CheckPermission(userId int, requiredRole entity.Role) error
+	GetAllUsers() ([]entity.User, error)
+	GetUserById(userId int) (entity.User, error)
+	DeleteUser(userId int) error
 }
 
 type InstrumentWithDiscount struct {
@@ -26,6 +31,10 @@ type Instrument interface {
 	CreateInstrument(instrument entity.Instrument) (id int, err error)
 	GetActiveDiscount(instrumentId int) (*entity.Discount, error)
 	DeleteInstrument(callerId int, instrumentId int) error
+	GetCategories() ([]entity.Category, error)
+	GetManufacturers() ([]entity.Manufacturer, error)
+	CreateCategory(callerId int, category entity.Category) (int, error)
+	CreateManufacturer(callerId int, manufacturer entity.Manufacturer) (int, error)
 }
 
 type Repair interface {

@@ -29,7 +29,11 @@ func newInstPostgres(db *sqlx.DB) *InstPostgres {
 
 func (s *InstPostgres) GetInstrument(id int) (entity.Instrument, error) {
 	var instrument entity.Instrument
-	query := fmt.Sprintf("SELECT * FROM %s WHERE instrument_id = $1", instrumentsTable)
+	query := fmt.Sprintf(`
+		SELECT instrument_id, instrument_name, category_id, 
+			   manufacturer_id, store_id, description, 
+			   price_per_day, image_url 
+		FROM %s WHERE instrument_id = $1`, instrumentsTable)
 	err := s.db.Get(&instrument, query, id)
 	if errors.Is(err, sql.ErrNoRows) {
 		return instrument, &httpError.ErrorWithStatusCode{
@@ -44,7 +48,10 @@ func (s *InstPostgres) GetAllInstruments(filter entity.InstFilter) ([]entity.Ins
 	instruments := make([]entity.Instrument, 0)
 
 	query := fmt.Sprintf(`
-		SELECT i.* FROM %s i
+		SELECT i.instrument_id, i.instrument_name, i.category_id, 
+			   i.manufacturer_id, i.store_id, i.description, 
+			   i.price_per_day, i.image_url 
+		FROM %s i
 		LEFT JOIN categories c ON i.category_id = c.category_id
 		LEFT JOIN manufacturers m ON i.manufacturer_id = m.manufacturer_id
 		WHERE TRUE`, instrumentsTable)
@@ -93,14 +100,25 @@ func (s *InstPostgres) GetAllInstruments(filter entity.InstFilter) ([]entity.Ins
 }
 
 func (s *InstPostgres) CreateInstrument(instrument entity.Instrument) (id int, err error) {
-	query := fmt.Sprintf("INSERT INTO %s (instrument_name, category_id, store_id, manufacturer_id, description, price_per_day) VALUES ($1, $2, $3, $4, $5, $6) RETURNING instrument_id", instrumentsTable)
-	err = s.db.QueryRow(query,
+	query := fmt.Sprintf(`
+		INSERT INTO %s (
+			instrument_name, category_id, store_id, 
+			manufacturer_id, description, price_per_day, 
+			image_url
+		) VALUES ($1, $2, $3, $4, NULLIF($5, ''), $6, $7) 
+		RETURNING instrument_id
+	`, instrumentsTable)
+
+	err = s.db.QueryRow(
+		query,
 		instrument.InstrumentName,
 		instrument.CategoryId,
 		instrument.StoreId,
 		instrument.ManufacturerId,
 		instrument.Description,
-		instrument.PricePerDay).Scan(&id)
+		instrument.PricePerDay,
+		instrument.ImageUrl,
+	).Scan(&id)
 
 	if err == nil {
 		return id, err
@@ -143,9 +161,13 @@ func (s *InstPostgres) CreateInstrument(instrument entity.Instrument) (id int, e
 }
 
 func (s *InstPostgres) GetActiveDiscount(instrumentId int) (*entity.Discount, error) {
-
 	var discount entity.Discount
-	query := fmt.Sprintf(`SELECT * FROM %s WHERE instrument_id = $1 AND valid_until > $2`, discountsTable)
+	query := fmt.Sprintf(`
+		SELECT discount_id, instrument_id, discount_percentage, valid_until 
+		FROM %s 
+		WHERE instrument_id = $1 AND valid_until > $2
+	`, discountsTable)
+
 	err := s.db.Get(&discount, query, instrumentId, time.Now())
 
 	if err == nil {
@@ -161,7 +183,6 @@ func (s *InstPostgres) GetActiveDiscount(instrumentId int) (*entity.Discount, er
 		HTTPStatus: http.StatusInternalServerError,
 		Msg:        "internal server error during discount obtaining instrument",
 	}
-
 }
 
 func (s *InstPostgres) DeleteInstrument(id int) error {
@@ -184,4 +205,72 @@ func (s *InstPostgres) DeleteInstrument(id int) error {
 	}
 
 	return nil
+}
+
+func (s *InstPostgres) GetCategories() ([]entity.Category, error) {
+	var categories []entity.Category
+	query := fmt.Sprintf(`SELECT category_id, category_name, category_description FROM %s`, categoriesTable)
+
+	err := s.db.Select(&categories, query)
+	if err != nil {
+		return nil, err
+	}
+
+	return categories, nil
+}
+
+func (s *InstPostgres) GetManufacturers() ([]entity.Manufacturer, error) {
+	var manufacturers []entity.Manufacturer
+	query := fmt.Sprintf(`SELECT manufacturer_id, manufacturer_name FROM %s`, manufacturersTable)
+
+	err := s.db.Select(&manufacturers, query)
+	if err != nil {
+		return nil, err
+	}
+
+	return manufacturers, nil
+}
+
+func (s *InstPostgres) CreateCategory(category entity.Category) (int, error) {
+	var id int
+	query := fmt.Sprintf(`
+		INSERT INTO %s (category_name, category_description) 
+		VALUES ($1, $2) RETURNING category_id
+	`, categoriesTable)
+
+	err := s.db.QueryRow(query, category.CategoryName, category.CategoryDescription).Scan(&id)
+	if err != nil {
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) && pqErr.Code.Name() == "unique_violation" {
+			return 0, &httpError.ErrorWithStatusCode{
+				HTTPStatus: http.StatusBadRequest,
+				Msg:        "категория с таким названием уже существует",
+			}
+		}
+		return 0, err
+	}
+
+	return id, nil
+}
+
+func (s *InstPostgres) CreateManufacturer(manufacturer entity.Manufacturer) (int, error) {
+	var id int
+	query := fmt.Sprintf(`
+		INSERT INTO %s (manufacturer_name) 
+		VALUES ($1) RETURNING manufacturer_id
+	`, manufacturersTable)
+
+	err := s.db.QueryRow(query, manufacturer.ManufacturerName).Scan(&id)
+	if err != nil {
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) && pqErr.Code.Name() == "unique_violation" {
+			return 0, &httpError.ErrorWithStatusCode{
+				HTTPStatus: http.StatusBadRequest,
+				Msg:        "производитель с таким названием уже существует",
+			}
+		}
+		return 0, err
+	}
+
+	return id, nil
 }

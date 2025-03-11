@@ -12,6 +12,7 @@ type Instrument struct {
 	InstrumentName string          `json:"instrument_name" db:"instrument_name"`
 	Description    string          `json:"description" db:"description"`
 	PricePerDay    decimal.Decimal `json:"price_per_day" db:"price_per_day"`
+	ImageUrl       *string         `json:"image_url" db:"image_url"`
 }
 
 type Manufacturer struct {

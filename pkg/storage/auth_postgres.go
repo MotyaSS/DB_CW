@@ -70,7 +70,7 @@ func (s *AuthPostgres) GetRole(roleId int) (entity.Role, error) {
 	var role entity.Role
 	err := s.db.Get(
 		&role,
-		fmt.Sprintf("SELECT role_name FROM %s WHERE role_id=$1", rolesTable),
+		fmt.Sprintf("SELECT * FROM %s WHERE role_id=$1", rolesTable),
 		roleId,
 	)
 	return role, err
@@ -96,11 +96,94 @@ func (s *AuthPostgres) GetAllRoles() ([]entity.Role, error) {
 }
 
 func (s *AuthPostgres) GetUserRole(userId int) (entity.Role, error) {
-	var role entity.Role
+	var roleId int
+	// Сначала получаем role_id пользователя
 	err := s.db.Get(
-		&role,
-		fmt.Sprintf("SELECT role_id FROM %s WHERE user_id=$1", usersTable),
+		&roleId,
+		fmt.Sprintf("SELECT role_id FROM %s WHERE user_id = $1", usersTable),
 		userId,
 	)
-	return role, err
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return entity.Role{}, &httpError.ErrorWithStatusCode{
+				HTTPStatus: http.StatusNotFound,
+				Msg:        "user not found",
+			}
+		}
+		return entity.Role{}, err
+	}
+
+	// Затем получаем полную информацию о роли
+	var role entity.Role
+	err = s.db.Get(
+		&role,
+		fmt.Sprintf("SELECT role_id, role_name FROM %s WHERE role_id = $1", rolesTable),
+		roleId,
+	)
+	if err != nil {
+		return entity.Role{}, err
+	}
+
+	return role, nil
+}
+
+func (s *AuthPostgres) GetAllUsers() ([]entity.User, error) {
+	var users []entity.User
+	query := fmt.Sprintf(`
+		SELECT user_id, username, email, phone_number, role_id 
+		FROM %s
+	`, usersTable)
+
+	err := s.db.Select(&users, query)
+	if err != nil {
+		return nil, &httpError.ErrorWithStatusCode{
+			HTTPStatus: http.StatusInternalServerError,
+			Msg:        "error getting users list",
+		}
+	}
+
+	return users, nil
+}
+
+func (s *AuthPostgres) GetUserById(userId int) (entity.User, error) {
+	var user entity.User
+	query := fmt.Sprintf(`
+		SELECT u.user_id, u.username, u.email, u.phone_number, u.role_id 
+		FROM %s u WHERE u.user_id = $1
+	`, usersTable)
+
+	err := s.db.Get(&user, query, userId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return user, &httpError.ErrorWithStatusCode{
+				HTTPStatus: http.StatusNotFound,
+				Msg:        "user not found",
+			}
+		}
+		return user, err
+	}
+
+	return user, nil
+}
+
+func (s *AuthPostgres) DeleteUser(userId int) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE user_id = $1", usersTable)
+	result, err := s.db.Exec(query, userId)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return &httpError.ErrorWithStatusCode{
+			HTTPStatus: http.StatusNotFound,
+			Msg:        "user not found",
+		}
+	}
+
+	return nil
 }

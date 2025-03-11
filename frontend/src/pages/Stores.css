@@ -1,0 +1,15 @@
+.stores-page {
+    padding: 2rem;
+}
+
+.stores-page h1 {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.stores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 1rem;
+}

@@ -39,7 +39,8 @@ CREATE TABLE instruments
     manufacturer_id INT            NOT NULL REFERENCES manufacturers (manufacturer_id),
     store_id        INT            NOT NULL REFERENCES stores (store_id),
     description     TEXT,
-    price_per_day   DECIMAL(10, 2) NOT NULL
+    price_per_day   DECIMAL(10, 2) NOT NULL,
+    image_url       TEXT           -- Добавляем новый столбец, NULL по умолчанию
 );
 CREATE TABLE rentals
 (
@@ -91,3 +92,22 @@ VALUES ('customer'),
 INSERT INTO stores (store_name, store_address, phone_number)
 VALUES ('Downtown Store', '123 Main St', '+123456789'),
        ('Uptown Store', '456 Elm St', '+987654321');
+
+-- Добавляем категории инструментов
+INSERT INTO categories (category_name, category_description) VALUES 
+    ('Струнные', 'Струнные музыкальные инструменты'),
+    ('Духовые', 'Духовые музыкальные инструменты'),
+    ('Клавишные', 'Клавишные музыкальные инструменты'),
+    ('Ударные', 'Ударные музыкальные инструменты'),
+    ('Электронные', 'Электронные музыкальные инструменты');
+
+-- Добавляем производителей
+INSERT INTO manufacturers (manufacturer_name) VALUES 
+    ('Yamaha'),
+    ('Roland'),
+    ('Fender'),
+    ('Gibson'),
+    ('Pearl'),
+    ('Ibanez'),
+    ('Casio'),
+    ('Kawai');

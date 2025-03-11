@@ -1,61 +1,72 @@
-import { createContext, useContext, useState } from 'react'
-import { apiClient } from '../api/client'
+import { createContext, useContext, useState, useEffect } from 'react'
+import axios from 'axios'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null)
-    const [token, setToken] = useState(localStorage.getItem('token'))
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        checkAuth()
+    }, [])
+
+    const checkAuth = async () => {
+        const token = localStorage.getItem('token')
+        if (token) {
+            try {
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+                const response = await axios.get('http://localhost:8080/api/auth/me')
+                setUser(response.data)
+            } catch (err) {
+                console.error('Auth check failed:', err)
+                localStorage.removeItem('token')
+                delete axios.defaults.headers.common['Authorization']
+            }
+        }
+        setLoading(false)
+    }
 
     const login = async (username, password) => {
-        try {
-            const { data } = await apiClient.post('/api/sign-in', { username, password })
-            localStorage.setItem('token', data.token)
-            setToken(data.token)
-            // Получаем данные пользователя
-            const userResponse = await apiClient.get('/api/users/profile', {
-                headers: { Authorization: `Bearer ${data.token}` }
-            })
-            setUser(userResponse.data)
-        } catch (error) {
-            console.error('Login error:', error)
-            throw error
-        }
+        const response = await axios.post('http://localhost:8080/api/auth/sign-in', {
+            username,
+            password
+        })
+        const { token } = response.data
+        localStorage.setItem('token', token)
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+
+        const userResponse = await axios.get('http://localhost:8080/api/auth/me')
+        setUser(userResponse.data)
+        return userResponse.data
+    }
+
+    const register = async (userData) => {
+        await axios.post('http://localhost:8080/api/auth/sign-up', userData)
     }
 
     const logout = () => {
         localStorage.removeItem('token')
-        setToken(null)
+        delete axios.defaults.headers.common['Authorization']
         setUser(null)
     }
 
-    const register = async (userData) => {
-        try {
-            await apiClient.post('/api/sign-up', userData)
-        } catch (error) {
-            console.error('Registration error:', error)
-            throw error
-        }
+    const value = {
+        user,
+        loading,
+        login,
+        logout,
+        register,
+        checkAuth
     }
 
     return (
-        <AuthContext.Provider value={{
-            user,
-            token,
-            isAuthenticated: !!token,
-            login,
-            logout,
-            register
-        }}>
-            {children}
+        <AuthContext.Provider value={value}>
+            {!loading && children}
         </AuthContext.Provider>
     )
 }
 
-export const useAuth = () => {
-    const context = useContext(AuthContext)
-    if (!context) {
-        throw new Error('useAuth must be used within AuthProvider')
-    }
-    return context
+export function useAuth() {
+    return useContext(AuthContext)
 } 

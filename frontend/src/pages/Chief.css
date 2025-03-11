@@ -1,0 +1,67 @@
+.chief-page {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.chief-page h1 {
+    margin-bottom: 2rem;
+    color: #ffffff;
+}
+
+.chief-content {
+    display: grid;
+    gap: 2rem;
+}
+
+.chief-content section {
+    background: #1a1f2e;
+    border-radius: 8px;
+    padding: 2rem;
+}
+
+.chief-content h2 {
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+}
+
+.management-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+    align-items: center;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.management-buttons button {
+    background: #646cff;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: 100%;
+    text-align: center;
+}
+
+.management-buttons button:hover {
+    background: #535bf2;
+}
+
+.error-message {
+    background: #ff4d4d20;
+    color: #ff4d4d;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.success-message {
+    background: #4caf5020;
+    color: #4caf50;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}

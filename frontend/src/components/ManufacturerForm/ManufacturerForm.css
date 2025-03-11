@@ -1,0 +1,8 @@
+.manufacturer-form {
+    background: #2a3142;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Остальные стили такие же, как в CategoryForm.css */

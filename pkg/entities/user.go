@@ -8,15 +8,3 @@ type User struct {
 	Password    string `json:"password" db:"password" binding:"required"`
 	RoleId      int    `json:"role_id" db:"role_id"`
 }
-
-type Role struct {
-	RoleId   int    `json:"role_id" db:"role_id"`
-	RoleName string `json:"role_name" db:"role_name"`
-}
-
-var (
-	RoleCustomer Role = Role{1, "customer"}
-	RoleStaff         = Role{2, "Staff"}
-	RoleChief         = Role{3, "Chief"}
-	RoleAdmin         = Role{4, "Admin"}
-)

@@ -1,0 +1,72 @@
+.store-card {
+    background: #2a3142;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    padding: 1.5rem;
+}
+
+.store-card:hover {
+    transform: translateY(-4px);
+}
+
+.store-info h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.6rem;
+    color: #ffffff;
+    border-bottom: 2px solid #646cff;
+    padding-bottom: 0.5rem;
+}
+
+.store-details {
+    padding-top: 0.5rem;
+}
+
+.store-title {
+    color: #646cff;
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+    font-weight: 500;
+}
+
+.store-address {
+    color: #8b95a9;
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.store-phone {
+    color: #8b95a9;
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.store-hours {
+    color: #8b95a9;
+    margin: 0.5rem 0;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.icon {
+    font-size: 1.2rem;
+    min-width: 1.5rem;
+}
+
+.store-phone a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.store-phone a:hover {
+    color: #646cff;
+}

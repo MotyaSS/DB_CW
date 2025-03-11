@@ -6,29 +6,42 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (*Handler) getAllUsers(ctx *gin.Context) {
-	ctx.JSON(
-		http.StatusOK,
-		"all users",
-	)
+func (h *Handler) getAllUsers(c *gin.Context) {
+	users, err := h.service.Authorisation.GetAllUsers()
+	if err != nil {
+		abortWithError(c, err)
+		return
+	}
+
+	// Возвращаем массив в поле items
+	c.JSON(http.StatusOK, gin.H{
+		"items": users,
+	})
 }
 
-func (*Handler) getUser(ctx *gin.Context) {
-	ctx.JSON(
-		http.StatusOK,
-		[]string{
-			"user ",
-			ctx.Param("user_id"),
-		},
-	)
+
+func (h *Handler) getUser(ctx *gin.Context) {
+	callerId, err := h.getCallerId(ctx)
+	if err != nil {
+		abortWithError(ctx, err)
+		return
+	}
+
+	user, err := h.service.Authorisation.GetUserById(callerId)
+	if err != nil {
+		abortWithError(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, user)
 }
 
-func (*Handler) deleteUser(ctx *gin.Context) {
-	ctx.JSON(
-		http.StatusOK,
-		[]string{
-			"user deleted",
-			ctx.Param("user_id"),
-		},
-	)
+func (h *Handler) deleteUser(ctx *gin.Context) {
+	callerId, err := h.getCallerId(ctx)
+	if err != nil {
+		abortWithError(ctx, err)
+		return
+	}
+
+	h.service.Authorisation.DeleteUser(callerId)
 }

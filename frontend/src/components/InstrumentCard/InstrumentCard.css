@@ -2,87 +2,87 @@
     background: #2a3142;
     border-radius: 8px;
     overflow: hidden;
-    transition: transform 0.3s ease;
-    border: 1px solid #3a4255;
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    position: relative;
+    height: 100%;
+    width: 100%;
 }
 
 .instrument-card:hover {
     transform: translateY(-4px);
 }
 
-.instrument-card__image {
+.instrument-image {
     position: relative;
     width: 100%;
     height: 200px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #1a1f2e;
 }
 
-.instrument-card__image img {
+.instrument-image::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.4) 100%);
+    pointer-events: none;
+}
+
+.instrument-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.3s;
+    display: block;
 }
 
-.instrument-card__status {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.875rem;
-    font-weight: 500;
+.instrument-card:hover .instrument-image img {
+    transform: scale(1.05);
 }
 
-.status-available {
-    background-color: rgba(72, 187, 120, 0.9);
-    color: white;
-}
-
-.status-rented {
-    background-color: rgba(245, 101, 101, 0.9);
-    color: white;
-}
-
-.instrument-card__content {
+.instrument-info {
     padding: 1rem;
+    flex: 1;
 }
 
-.instrument-card__title {
-    margin: 0 0 0.5rem;
-    font-size: 1.25rem;
+.instrument-info h3 {
     color: #ffffff;
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
 }
 
-.instrument-card__description {
-    margin: 0 0 1rem;
-    color: #8b95aa;
-    font-size: 0.875rem;
-    line-height: 1.5;
-}
-
-.instrument-card__price {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #64b5f6;
+.description {
+    color: #8b95a9;
     margin-bottom: 1rem;
+    font-size: 0.9rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-.instrument-card__button {
-    width: 100%;
-    padding: 0.75rem;
-    background-color: #64b5f6;
-    color: white;
-    border: none;
-    border-radius: 4px;
+.price {
+    color: #646cff;
     font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+    font-size: 1.1rem;
+    margin: 0;
 }
 
-.instrument-card__button:hover:not(:disabled) {
-    background-color: #4a90e2;
+.discount {
+    display: inline-block;
+    background: #4caf5020;
+    color: #4caf50;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
 }
-
-.instrument-card__button:disabled {
-    background-color: #3a4255;
-    cursor: not-allowed;
-} 

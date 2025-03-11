@@ -81,6 +81,10 @@ func (s *AuthService) GetAllRoles() ([]entity.Role, error) {
 	return s.storage.GetAllRoles()
 }
 
+func (s *AuthService) GetRole(roleId int) (entity.Role, error) {
+	return s.storage.GetRole(roleId)
+}
+
 func (s *AuthService) GetUserRole(userId int) (entity.Role, error) {
 	role, err := s.storage.GetRole(userId)
 	if err != nil {
@@ -198,4 +202,29 @@ func (s *AuthService) ParseToken(accessToken string) (int, error) {
 	}
 
 	return claims.UserId, nil
+}
+
+func (s *AuthService) GetAllUsers() ([]entity.User, error) {
+	users, err := s.storage.GetAllUsers()
+	if err != nil {
+		return nil, &httpError.ErrorWithStatusCode{
+			HTTPStatus: http.StatusInternalServerError,
+			Msg:        "error getting users list",
+		}
+	}
+
+	// Не возвращаем чувствительные данные
+	for i := range users {
+		users[i].Password = ""
+	}
+
+	return users, nil
+}
+
+func (s *AuthService) GetUserById(userId int) (entity.User, error) {
+	return s.storage.GetUserById(userId)
+}
+
+func (s *AuthService) DeleteUser(userId int) error {
+	return s.storage.DeleteUser(userId)
 }
