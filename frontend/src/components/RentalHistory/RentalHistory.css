@@ -1,0 +1,99 @@
+.rental-history {
+    background: #2a3142;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-top: 2rem;
+}
+
+.rental-history h2 {
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+}
+
+.no-rentals {
+    color: #8b95a9;
+    text-align: center;
+    font-style: italic;
+    padding: 2rem;
+}
+
+.rentals-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.rental-item {
+    background: #1a1f2e;
+    padding: 1rem;
+    border-radius: 8px;
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 1rem;
+    align-items: start;
+}
+
+.rental-dates {
+    color: #8b95a9;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.rental-details {
+    margin-top: 0.5rem;
+}
+
+.rental-price {
+    color: #646cff;
+    margin: 0;
+    font-weight: 500;
+}
+
+.status {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.status.active {
+    background: #4caf5020;
+    color: #4caf50;
+}
+
+.status.returned {
+    background: #64646420;
+    color: #8b95a9;
+}
+
+.instrument-image {
+    width: 120px;
+    height: 120px;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.instrument-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.instrument-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.instrument-info h3 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 1.2rem;
+}
+
+.instrument-description {
+    color: #8b95a9;
+    font-size: 0.9rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}

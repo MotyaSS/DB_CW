@@ -11,6 +11,7 @@ import (
 	entity "github.com/MotyaSS/DB_CW/pkg/entities"
 	"github.com/MotyaSS/DB_CW/pkg/httpError"
 	"github.com/jmoiron/sqlx"
+	"github.com/shopspring/decimal"
 )
 
 type RentPostgres struct {
@@ -24,15 +25,16 @@ func newRentPostgres(db *sqlx.DB) *RentPostgres {
 func (r *RentPostgres) CreateRental(rental entity.Rental) (int, error) {
 	var id int
 	query := fmt.Sprintf(`
-		INSERT INTO %s (user_id, instrument_id, rental_date)
-		VALUES ($1, $2, $3)
+		INSERT INTO %s (user_id, instrument_id, rental_date, return_date)
+		VALUES ($1, $2, $3, $4)
 		RETURNING rental_id
 	`, rentalsTable)
 
 	err := r.db.QueryRow(query,
 		rental.UserId,
 		rental.InstrumentId,
-		time.Now(),
+		rental.RentalDate,
+		rental.ReturnDate,
 	).Scan(&id)
 
 	if err != nil {
@@ -74,16 +76,39 @@ func (r *RentPostgres) GetRental(id int) (entity.Rental, error) {
 func (r *RentPostgres) GetUserRentals(userId int) ([]entity.Rental, error) {
 	var rentals []entity.Rental
 	query := fmt.Sprintf(`
-		SELECT * FROM %s WHERE user_id = $1
-	`, rentalsTable)
+		SELECT r.*, i.instrument_name, i.description, i.price_per_day, i.image_url
+		FROM %s r
+		LEFT JOIN %s i ON r.instrument_id = i.instrument_id
+		WHERE r.user_id = $1
+	`, rentalsTable, instrumentsTable)
 
-	err := r.db.Select(&rentals, query, userId)
+	type rentalWithInstrument struct {
+		entity.Rental
+		InstrumentName string          `db:"instrument_name"`
+		Description    string          `db:"description"`
+		PricePerDay    decimal.Decimal `db:"price_per_day"`
+		ImageUrl       string          `db:"image_url"`
+	}
+
+	var rentalRows []rentalWithInstrument
+	err := r.db.Select(&rentalRows, query, userId)
 	if err != nil {
 		slog.Error("error getting user rentals", "err", err.Error())
 		return nil, &httpError.ErrorWithStatusCode{
 			HTTPStatus: http.StatusInternalServerError,
 			Msg:        "error getting user rentals",
 		}
+	}
+
+	for _, row := range rentalRows {
+		rental := row.Rental
+		rental.Instrument = &entity.Instrument{
+			InstrumentName: row.InstrumentName,
+			Description:    row.Description,
+			PricePerDay:    row.PricePerDay,
+			ImageUrl:       &row.ImageUrl,
+		}
+		rentals = append(rentals, rental)
 	}
 
 	return rentals, nil

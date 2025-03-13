@@ -1,0 +1,67 @@
+.create-user-form {
+    background: #2a3142;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.create-user-form h2 {
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+}
+
+.create-user-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.create-user-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #8b95a9;
+}
+
+.create-user-form input {
+    width: 100%;
+    padding: 0.75rem;
+    background: #1a1f2e;
+    border: 1px solid #3f4758;
+    border-radius: 4px;
+    color: white;
+}
+
+.create-user-form input:focus {
+    outline: none;
+    border-color: #646cff;
+}
+
+.create-user-form button {
+    width: 100%;
+    padding: 0.75rem;
+    background: #646cff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    margin-top: 1rem;
+}
+
+.create-user-form button:hover {
+    background: #535bf2;
+}
+
+.status-message {
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.status-message.success {
+    background: #4caf5020;
+    color: #4caf50;
+}
+
+.status-message.error {
+    background: #ff4d4d20;
+    color: #ff4d4d;
+}

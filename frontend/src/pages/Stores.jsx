@@ -29,14 +29,20 @@ export default function Stores() {
     return (
         <div className="stores-page">
             <h1>Наши магазины</h1>
-            <div className="stores-grid">
-                {stores.map((store, index) => (
-                    <StoreCard 
-                        key={store.id || `store-${index}`} 
-                        store={store} 
-                    />
-                ))}
-            </div>
+            {stores.length === 0 ? (
+                <div className="no-stores">
+                    Магазины пока не добавлены
+                </div>
+            ) : (
+                <div className="stores-grid">
+                    {stores.map((store, index) => (
+                        <StoreCard 
+                            key={store.id || `store-${index}`} 
+                            store={store} 
+                        />
+                    ))}
+                </div>
+            )}
         </div>
     )
 } 

@@ -21,9 +21,9 @@ func New(service *service.Service) *Handler {
 func (h *Handler) InitRouter(middleware ...gin.HandlerFunc) *gin.Engine {
 	router := gin.Default()
 
-	// Настройка CORS
+	// CORS
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:5173"} // URL вашего фронтенда
+	config.AllowOrigins = []string{"http://localhost:5173"} 
 	config.AllowCredentials = true
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
@@ -31,7 +31,6 @@ func (h *Handler) InitRouter(middleware ...gin.HandlerFunc) *gin.Engine {
 	router.Use(cors.New(config))
 	router.Use(middleware...)
 
-	// Отключаем автоматическое добавление слэша
 	router.RedirectTrailingSlash = false
 	router.RedirectFixedPath = false
 
@@ -60,12 +59,11 @@ func (h *Handler) InitRouter(middleware ...gin.HandlerFunc) *gin.Engine {
 
 		item := items.Group("/:inst_id")
 		{
-			item.POST("/rent", h.userIdentity, h.rentInstrument)
 			item.GET("", h.getInstrument)
 			item.DELETE("", h.userIdentity, h.deleteInstrument)
-			repairment := item.Group("/repairments")
+			repairment := item.Group("/repairments", h.userIdentity)
 			{
-				repairment.POST("", h.userIdentity, h.createRepair)
+				repairment.POST("", h.createRepair)
 				repairment.GET("", h.getAllRepairs)
 				repairment.GET("/:repairment_id", h.getRepair)
 			}
@@ -76,14 +74,19 @@ func (h *Handler) InitRouter(middleware ...gin.HandlerFunc) *gin.Engine {
 				reviews.GET("", h.getAllReviews)
 				reviews.POST("", h.userIdentity, h.createReview)
 			}
+			rent := item.Group("/rent", h.userIdentity)
+			{
+				rent.POST("", h.createRental)
+				rent.GET("", h.getInstrumentRentals)
+			}
 		}
 	}
 
 	stores := apiRouter.Group("/stores")
 	{
 		stores.GET("", h.getAllStores)
-		stores.GET("/:store_id", h.getStore)
-		stores.POST("/:store_id", h.userIdentity, h.createStore)
+		stores.GET("/", h.getStore)
+		stores.POST("/", h.userIdentity, h.createStore)
 		stores.DELETE("/:store_id", h.userIdentity, h.deleteStore)
 	}
 	users := apiRouter.Group("/users", h.userIdentity)
@@ -91,6 +94,13 @@ func (h *Handler) InitRouter(middleware ...gin.HandlerFunc) *gin.Engine {
 		users.GET("", h.getAllUsers)
 		users.GET("/:user_id", h.getUser)
 		users.DELETE("/:user_id", h.deleteUser)
+	}
+
+	rentals := apiRouter.Group("/rentals", h.userIdentity)
+	{
+		rentals.GET("", h.getUserRentals)
+		rentals.GET("/:rental_id", h.getRental)
+		rentals.POST("/:rental_id/return", h.returnInstrument)
 	}
 	return router
 }

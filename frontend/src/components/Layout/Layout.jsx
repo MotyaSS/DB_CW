@@ -19,17 +19,19 @@ export default function Layout() {
         <div className="layout">
             <header className="layout-header">
                 <nav className="layout-nav">
-                    <NavLink to="/">Главная</NavLink>
-                    <NavLink to="/instruments">Инструменты</NavLink>
-                    <NavLink to="/stores">Магазины</NavLink>
-                    {user && (
-                        <>
-                            <NavLink to="/profile">Профиль</NavLink>
-                            {user.role_id >= 2 && <NavLink to="/staff">Персонал</NavLink>}
-                            {user.role_id >= 3 && <NavLink to="/chief">Управление</NavLink>}
-                            {user.role_id === 4 && <NavLink to="/admin">Админ панель</NavLink>}
-                        </>
-                    )}
+                    <div className="nav-links">
+                        <NavLink to="/">Главная</NavLink>
+                        <NavLink to="/instruments">Инструменты</NavLink>
+                        <NavLink to="/stores">Магазины</NavLink>
+                        {user && (
+                            <>
+                                <NavLink to="/profile">Профиль</NavLink>
+                                {user.role_id >= 2 && <NavLink to="/staff">Персонал</NavLink>}
+                                {user.role_id >= 3 && <NavLink to="/chief">Менеджер</NavLink>}
+                                {user.role_id === 4 && <NavLink to="/admin">Админ</NavLink>}
+                            </>
+                        )}
+                    </div>
                     <div className="auth-section">
                         {user && <span className="username">{user.username}</span>}
                         <button onClick={handleAuth}>

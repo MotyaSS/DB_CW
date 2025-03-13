@@ -136,28 +136,6 @@ func (h *Handler) deleteInstrument(ctx *gin.Context) {
 	)
 }
 
-func (h *Handler) rentInstrument(ctx *gin.Context) {
-	callerId, err := h.getCallerId(ctx)
-	if err != nil {
-		abortWithError(ctx, err)
-		return
-	}
-	instId, err := strconv.Atoi(ctx.Param("inst_id"))
-	if err != nil {
-		abortWithError(ctx, err)
-		return
-	}
-	id, err := h.service.Rent.CreateRental(callerId, instId)
-	if err != nil {
-		abortWithError(ctx, err)
-		return
-	}
-	ctx.JSON(
-		http.StatusOK,
-		gin.H{"id": id},
-	)
-}
-
 func (h *Handler) getCategories(c *gin.Context) {
 	categories, err := h.service.Instrument.GetCategories()
 	if err != nil {

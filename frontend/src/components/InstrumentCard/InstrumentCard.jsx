@@ -12,12 +12,7 @@ export default function InstrumentCard({ instrument }) {
         description,
         price_per_day,
         image_url
-    } = instrument.Instrument || instrument // Поддерживаем оба варианта структуры
-
-    // Добавляем логи
-    console.log('Raw instrument:', instrument)
-    console.log('Extracted image_url:', image_url)
-    console.log('Final image source:', image_url || defaultImage)
+    } = instrument.Instrument || instrument
 
     return (
         <Link to={`/instruments/${instrument_id}`} className="instrument-card">
@@ -26,7 +21,6 @@ export default function InstrumentCard({ instrument }) {
                     src={image_url || defaultImage}
                     alt={instrument_name}
                     onError={(e) => {
-                        console.log('Image load error for:', instrument_name)
                         e.target.src = defaultImage
                     }}
                 />

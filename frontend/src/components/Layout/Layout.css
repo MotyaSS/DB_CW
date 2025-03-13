@@ -15,6 +15,7 @@
     display: flex;
     gap: 2rem;
     align-items: center;
+    justify-content: space-between;
 }
 
 .layout-nav a {
@@ -57,8 +58,15 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+    margin-left: auto;
 }
 
 .username {
     color: #8b95a9;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
 }

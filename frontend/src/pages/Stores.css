@@ -13,3 +13,13 @@
     gap: 2rem;
     padding: 1rem;
 }
+
+.no-stores {
+    text-align: center;
+    color: #8b95a9;
+    padding: 2rem;
+    background: #2a3142;
+    border-radius: 8px;
+    margin: 1rem;
+    font-style: italic;
+}

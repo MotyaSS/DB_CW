@@ -11,6 +11,7 @@
     background: #1a1f2e;
     padding: 2rem;
     border-radius: 8px;
+    margin-bottom: 2rem;
 }
 
 .instrument-image-large {
@@ -82,4 +83,34 @@
     .instrument-details-content {
         grid-template-columns: 1fr;
     }
+}
+
+.instrument-sections {
+    display: grid;
+    gap: 2rem;
+}
+
+.description-section,
+.reviews-section {
+    background: #1a1f2e;
+    padding: 2rem;
+    border-radius: 8px;
+}
+
+.description-section h2,
+.reviews-section h2 {
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.description-content {
+    color: #8b95a9;
+    line-height: 1.8;
+    white-space: pre-wrap;
+}
+
+.reviews-list {
+    display: grid;
+    gap: 1rem;
 }

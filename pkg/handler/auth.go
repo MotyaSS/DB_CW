@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"math"
 	"net/http"
 
@@ -27,6 +28,7 @@ func (h *Handler) signUp(ctx *gin.Context) {
 	var input signUpInput
 
 	if err := ctx.BindJSON(&input); err != nil {
+		fmt.Println(err)
 		abortWithStatusCode(ctx, http.StatusBadRequest, err.Error())
 		return
 	}

@@ -16,7 +16,7 @@
     color: #ffffff;
 }
 
-.create-chief-btn {
+.create-user-btn {
     background: #646cff;
     color: white;
     border: none;
@@ -26,7 +26,7 @@
     transition: background-color 0.2s;
 }
 
-.create-chief-btn:hover {
+.create-user-btn:hover {
     background: #535bf2;
 }
 
@@ -62,4 +62,20 @@
     padding: 2rem;
     color: #8b95a9;
     font-style: italic;
+}
+
+.admin-section {
+    background: #2a3142;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.admin-section:first-of-type {
+    margin-top: 2rem;
+}
+
+.admin-section h2 {
+    color: #ffffff;
+    margin-bottom: 1.5rem;
 }

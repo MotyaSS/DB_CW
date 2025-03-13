@@ -47,11 +47,10 @@ type Review interface {
 }
 
 type Rent interface {
-	CreateRental(userId int, instrumentId int) (int, error)
-	GetRental(id int) (entity.Rental, error)
+	CreateRental(userId, instrumentId int, startDate, endDate string) (int, error)
+	GetRental(rentalId int) (entity.Rental, error)
 	GetUserRentals(userId int) ([]entity.Rental, error)
 	GetInstrumentRentals(instrumentId int) ([]entity.Rental, error)
-	DeleteRental(id int) error
 	ReturnInstrument(rentalId int) error
 }
 
@@ -78,5 +77,6 @@ func New(storage *storage.Storage) *Service {
 		Instrument:    NewInstService(storage, auth),
 		Store:         NewStoreService(storage),
 		Rent:          NewRentService(storage),
+		Repair:        NewRepairService(storage, auth),
 	}
 }

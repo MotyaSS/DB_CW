@@ -48,7 +48,7 @@ CREATE TABLE rentals
     user_id       INT       NOT NULL REFERENCES users (user_id),
     instrument_id INT       NOT NULL REFERENCES instruments (instrument_id),
     rental_date   TIMESTAMP NOT NULL,
-    return_date   TIMESTAMP
+    return_date   TIMESTAMP NOT NULL
 );
 CREATE TABLE payments
 (

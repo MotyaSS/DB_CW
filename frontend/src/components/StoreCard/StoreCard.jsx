@@ -4,20 +4,15 @@ export default function StoreCard({ store }) {
     return (
         <div className="store-card">
             <div className="store-info">
-                <h3>{store.name}</h3>
+                <h3>{store.store_name}</h3>
                 <div className="store-details">
-                    <p className="store-title">{store.title || "Музыкальный магазин"}</p>
                     <p className="store-address">
                         <span className="icon">📍</span>
-                        {store.address}
+                        {store.store_address}
                     </p>
                     <p className="store-phone">
                         <span className="icon">📞</span>
-                        {store.phone}
-                    </p>
-                    <p className="store-hours">
-                        <span className="icon">🕒</span>
-                        Часы работы: {store.opening_hours || "Не указаны"}
+                        {store.phone_number}
                     </p>
                 </div>
             </div>

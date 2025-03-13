@@ -1,13 +1,18 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import axios from 'axios'
 import UserList from '../components/UserList/UserList'
+import CreateUserForm from '../components/CreateUserForm/CreateUserForm'
+import Modal from '../components/Modal/Modal'
 import './Admin.css'
 
 export default function Admin() {
+    const { user } = useAuth()
     const [users, setUsers] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const [isCreateUserModalOpen, setCreateUserModalOpen] = useState(false)
     const navigate = useNavigate()
     const token = localStorage.getItem('token')
 
@@ -55,10 +60,6 @@ export default function Admin() {
         }
     }
 
-    const handleCreateChiefAccount = async () => {
-        navigate('/register-chief')
-    }
-
     if (loading) return <div className="loading">Загрузка...</div>
     if (error) return <div className="error-message">{error}</div>
 
@@ -67,10 +68,10 @@ export default function Admin() {
             <div className="admin-header">
                 <h1>Панель администратора</h1>
                 <button
-                    className="create-chief-btn"
-                    onClick={handleCreateChiefAccount}
+                    className="create-user-btn"
+                    onClick={() => setCreateUserModalOpen(true)}
                 >
-                    Создать аккаунт Chief
+                    Создать аккаунт менеджера
                 </button>
             </div>
             <div className="admin-content">
@@ -86,6 +87,16 @@ export default function Admin() {
                     )}
                 </section>
             </div>
+            <Modal
+                isOpen={isCreateUserModalOpen}
+                onClose={() => setCreateUserModalOpen(false)}
+                title="Создать аккаунт менеджера"
+            >
+                <CreateUserForm
+                    roleId={2}
+                    title="Создать аккаунт менеджера"
+                />
+            </Modal>
         </div>
     )
 } 

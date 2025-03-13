@@ -9,43 +9,74 @@
     color: #ffffff;
 }
 
-.staff-content {
-    background: #1a1f2e;
-    border-radius: 8px;
-    padding: 2rem;
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
 }
 
-.repairs-section h2 {
+.section-header h2 {
     color: #ffffff;
-    margin-bottom: 1.5rem;
+    margin: 0;
 }
 
-.instruments-list {
+.add-repair-button {
+    background: #646cff;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.add-repair-button:hover {
+    background: #535bf2;
+}
+
+.instruments-grid {
     display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 2rem;
 }
 
-.instrument-repairs {
+.instrument-card {
     background: #2a3142;
-    padding: 1.5rem;
     border-radius: 8px;
+    padding: 1.5rem;
 }
 
-.instrument-repairs h3 {
+.instrument-info h3 {
+    margin: 0 0 1rem;
+    color: #ffffff;
+}
+
+.price {
+    color: #646cff;
+    font-weight: 500;
+}
+
+.repairs-container {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #3f4758;
+}
+
+.repairs-container h4 {
     color: #ffffff;
     margin-bottom: 1rem;
-    font-size: 1.2rem;
-}
-
-.repairs-list {
-    display: grid;
-    gap: 1rem;
 }
 
 .repair-item {
     background: #1a1f2e;
     padding: 1rem;
     border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.repair-item:last-child {
+    margin-bottom: 0;
 }
 
 .repair-dates {
@@ -54,19 +85,21 @@
     margin-bottom: 0.5rem;
 }
 
-.repair-cost {
-    color: #646cff;
-    font-weight: 500;
+.repair-description {
+    color: #ffffff;
     margin-bottom: 0.5rem;
 }
 
-.repair-description {
-    color: #ffffff;
+.repair-cost {
+    color: #646cff;
+    font-weight: 500;
 }
 
 .no-repairs {
     color: #8b95a9;
     font-style: italic;
+    text-align: center;
+    padding: 1rem;
 }
 
 .loading {
@@ -83,43 +116,10 @@
     margin-bottom: 1rem;
 }
 
-.instrument-summary {
-    display: flex;
-    gap: 2rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid #3f4758;
-}
-
-.instrument-info {
-    flex: 1;
-}
-
-.instrument-details {
-    margin-top: 1rem;
-    color: #8b95a9;
-}
-
-.instrument-image {
-    width: 150px;
-    height: 150px;
-    overflow: hidden;
+.success-message {
+    background: #4caf5020;
+    color: #4caf50;
+    padding: 1rem;
     border-radius: 4px;
-    flex-shrink: 0;
-}
-
-.instrument-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.repairs-container {
-    margin-top: 1rem;
-}
-
-.repairs-container h4 {
-    color: #ffffff;
     margin-bottom: 1rem;
-    font-size: 1.1rem;
 }

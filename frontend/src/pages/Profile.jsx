@@ -1,5 +1,6 @@
 import { useAuth } from '../context/AuthContext'
 import { getRoleName } from '../utils/roleUtils'
+import RentalHistory from '../components/RentalHistory/RentalHistory'
 import './Profile.css'
 
 export default function Profile() {
@@ -32,6 +33,7 @@ export default function Profile() {
                         <span className="role-badge">{getRoleName(user.role_id)}</span>
                     </div>
                 </div>
+                <RentalHistory />
             </div>
         </div>
     )

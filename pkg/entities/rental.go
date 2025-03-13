@@ -7,11 +7,12 @@ import (
 )
 
 type Rental struct {
-	RentalId     int       `json:"rental_id" db:"rental_id"`
-	UserId       int       `json:"user_id" db:"user_id"`
-	InstrumentId int       `json:"instrument_id" db:"instrument_id"`
-	RentalDate   time.Time `json:"rental_date" db:"rental_date"`
-	ReturnDate   time.Time `json:"return_date" db:"return_date"`
+	RentalId     int         `json:"rental_id" db:"rental_id"`
+	UserId       int         `json:"user_id" db:"user_id"`
+	InstrumentId int         `json:"instrument_id" db:"instrument_id"`
+	RentalDate   time.Time   `json:"rental_date" db:"rental_date"`
+	ReturnDate   time.Time   `json:"return_date" db:"return_date"`
+	Instrument   *Instrument `json:"instrument,omitempty"`
 }
 
 type Payment struct {

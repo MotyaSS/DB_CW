@@ -11,7 +11,8 @@
 
 .chief-content {
     display: grid;
-    gap: 2rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
 }
 
 .chief-content section {
@@ -23,6 +24,8 @@
 .chief-content h2 {
     color: #ffffff;
     margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    text-align: center;
 }
 
 .management-buttons {
@@ -30,7 +33,6 @@
     gap: 1rem;
     flex-direction: column;
     align-items: center;
-    max-width: 300px;
     margin: 0 auto;
 }
 
@@ -64,4 +66,45 @@
     padding: 1rem;
     border-radius: 4px;
     margin-bottom: 1rem;
+}
+
+.management-card .delete-button {
+    background: #dc3545;
+}
+
+.management-card .delete-button:hover {
+    background: #c82333;
+}
+
+@media (max-width: 1024px) {
+    .chief-content {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .chief-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+.chief-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.create-user-btn {
+    background: #646cff;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.create-user-btn:hover {
+    background: #535bf2;
 }
