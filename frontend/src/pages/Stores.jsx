@@ -36,9 +36,9 @@ export default function Stores() {
             ) : (
                 <div className="stores-grid">
                     {stores.map((store, index) => (
-                        <StoreCard 
-                            key={store.id || `store-${index}`} 
-                            store={store} 
+                        <StoreCard
+                            key={store.id || `store-${index}`}
+                            store={store}
                         />
                     ))}
                 </div>

@@ -1,0 +1,127 @@
+.backup-manager {
+    background: #2a3142;
+    padding: 2rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.backup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.backup-header h2 {
+    color: #ffffff;
+    margin: 0;
+}
+
+.create-backup-btn {
+    background: #646cff;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.create-backup-btn:hover {
+    background: #535bf2;
+}
+
+.create-backup-btn:disabled {
+    background: #4a4a4a;
+    cursor: not-allowed;
+}
+
+.backups-list {
+    margin-top: 2rem;
+}
+
+.backups-list h3 {
+    color: #8b95a9;
+    margin-bottom: 1rem;
+}
+
+.backups-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.backup-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #1a1f2e;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    gap: 2rem;
+}
+
+.backup-name {
+    color: #ffffff;
+    font-family: monospace;
+    flex: 1;
+}
+
+.restore-btn {
+    background: #4caf50;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    min-width: 120px;
+    white-space: nowrap;
+}
+
+.restore-btn:hover {
+    background: #45a049;
+}
+
+.restore-btn:disabled {
+    background: #4a4a4a;
+    cursor: not-allowed;
+}
+
+.status-message {
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.status-message.success {
+    background: #4caf5020;
+    color: #4caf50;
+}
+
+.status-message.error {
+    background: #ff4d4d20;
+    color: #ff4d4d;
+}
+
+.loading {
+    text-align: center;
+    color: #8b95a9;
+    padding: 1rem;
+}
+
+.error-message {
+    color: #ff4d4d;
+    padding: 1rem;
+    background: #ff4d4d20;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.no-backups {
+    color: #8b95a9;
+    text-align: center;
+    padding: 2rem;
+    background: #1a1f2e;
+    border-radius: 4px;
+}

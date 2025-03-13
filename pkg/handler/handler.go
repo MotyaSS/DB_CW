@@ -23,7 +23,7 @@ func (h *Handler) InitRouter(middleware ...gin.HandlerFunc) *gin.Engine {
 
 	// CORS
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:5173"} 
+	config.AllowOrigins = []string{"http://localhost:5173"}
 	config.AllowCredentials = true
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
@@ -102,5 +102,14 @@ func (h *Handler) InitRouter(middleware ...gin.HandlerFunc) *gin.Engine {
 		rentals.GET("/:rental_id", h.getRental)
 		rentals.POST("/:rental_id/return", h.returnInstrument)
 	}
+
+	// Добавляем новую группу маршрутов для бэкапов
+	backups := apiRouter.Group("/backups", h.userIdentity)
+	{
+		backups.POST("", h.createBackup)
+		backups.GET("", h.listBackups)
+		backups.POST("/restore", h.restoreBackup)
+	}
+
 	return router
 }

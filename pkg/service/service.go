@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/MotyaSS/DB_CW/pkg/config"
 	entity "github.com/MotyaSS/DB_CW/pkg/entities"
 	"github.com/MotyaSS/DB_CW/pkg/storage"
 )
@@ -61,6 +62,12 @@ type Store interface {
 	DeleteStore(id int) error
 }
 
+type Backup interface {
+	CreateBackup() (string, error)
+	RestoreFromBackup(backupName string) error
+	ListBackups() ([]string, error)
+}
+
 type Service struct {
 	Authorisation
 	Instrument
@@ -68,15 +75,19 @@ type Service struct {
 	Rent
 	Store
 	Repair
+	Backup
 }
 
-func New(storage *storage.Storage) *Service {
+func New(storage *storage.Storage, config config.Database) *Service {
 	auth := NewAuthService(storage)
+	backupService := NewBackupService(config)
+
 	return &Service{
 		Authorisation: auth,
 		Instrument:    NewInstService(storage, auth),
 		Store:         NewStoreService(storage),
 		Rent:          NewRentService(storage),
 		Repair:        NewRepairService(storage, auth),
+		Backup:        backupService,
 	}
 }

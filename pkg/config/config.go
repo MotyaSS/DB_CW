@@ -20,12 +20,13 @@ type HttpServer struct {
 }
 
 type Database struct {
-	Host     string `yaml:"host" env-required:"true"`
-	Port     string `yaml:"port" env-required:"true"`
-	Username string `yaml:"username" env-required:"true"`
-	Password string //configured through .env
-	DBName   string `yaml:"dbname" env-required:"true"`
-	SSLMode  string `yaml:"sslmode" env-required:"true"`
+	Host       string `yaml:"host" env-required:"true"`
+	Port       string `yaml:"port" env-required:"true"`
+	Username   string `yaml:"username" env-required:"true"`
+	BackupPath string `yaml:"backup_path" env-default:"./backups"`
+	Password   string //configured through .env
+	DBName     string `yaml:"dbname" env-required:"true"`
+	SSLMode    string `yaml:"sslmode" env-required:"true"`
 }
 
 func LoadConfig() (*Config, error) {

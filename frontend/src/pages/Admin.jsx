@@ -5,6 +5,7 @@ import axios from 'axios'
 import UserList from '../components/UserList/UserList'
 import CreateUserForm from '../components/CreateUserForm/CreateUserForm'
 import Modal from '../components/Modal/Modal'
+import BackupManager from '../components/BackupManager/BackupManager'
 import './Admin.css'
 
 export default function Admin() {
@@ -13,6 +14,7 @@ export default function Admin() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [isCreateUserModalOpen, setCreateUserModalOpen] = useState(false)
+    const [activeTab, setActiveTab] = useState('users')
     const navigate = useNavigate()
     const token = localStorage.getItem('token')
 
@@ -65,38 +67,45 @@ export default function Admin() {
 
     return (
         <div className="admin-page">
-            <div className="admin-header">
-                <h1>Панель администратора</h1>
+            <h1>Панель администратора</h1>
+
+            <div className="admin-tabs">
                 <button
-                    className="create-user-btn"
-                    onClick={() => setCreateUserModalOpen(true)}
+                    className={activeTab === 'users' ? 'active' : ''}
+                    onClick={() => setActiveTab('users')}
                 >
-                    Создать аккаунт менеджера
+                    Управление пользователями
+                </button>
+                <button
+                    className={activeTab === 'backups' ? 'active' : ''}
+                    onClick={() => setActiveTab('backups')}
+                >
+                    Управление бэкапами
                 </button>
             </div>
+
             <div className="admin-content">
-                <section className="users-section">
-                    <h2>Пользователи</h2>
-                    {users.length > 0 ? (
-                        <UserList
-                            users={users}
-                            onDelete={handleDeleteUser}
+                {activeTab === 'users' && (
+                    <div className="users-management">
+                        <CreateUserForm
+                            roleId={4}
+                            title="Создать нового администратора"
                         />
-                    ) : (
-                        <p className="no-users">Пользователи не найдены</p>
-                    )}
-                </section>
+                        <CreateUserForm
+                            roleId={3}
+                            title="Создать нового менеджера"
+                        />
+                        <CreateUserForm
+                            roleId={2}
+                            title="Создать нового сотрудника"
+                        />
+                    </div>
+                )}
+
+                {activeTab === 'backups' && (
+                    <BackupManager />
+                )}
             </div>
-            <Modal
-                isOpen={isCreateUserModalOpen}
-                onClose={() => setCreateUserModalOpen(false)}
-                title="Создать аккаунт менеджера"
-            >
-                <CreateUserForm
-                    roleId={2}
-                    title="Создать аккаунт менеджера"
-                />
-            </Modal>
         </div>
     )
 } 

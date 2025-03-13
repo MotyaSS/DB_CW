@@ -37,7 +37,7 @@ func main() {
 	}
 	storage := strg.New(db)
 
-	service := srvc.New(storage)
+	service := srvc.New(storage, config.Database)
 	handler := hnd.New(service)
 	server := srvr.New(
 		config.Address,

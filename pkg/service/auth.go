@@ -59,7 +59,7 @@ func (s *AuthService) HasPermission(userRole, requiredRole entity.Role) bool {
 
 // CheckPermission checks if the user has the required role or higher
 func (s *AuthService) CheckPermission(userId int, requiredRole entity.Role) error {
-	userRole, err := s.storage.GetRole(userId)
+	userRole, err := s.storage.GetUserRole(userId)
 	if err != nil {
 		return &httpError.ErrorWithStatusCode{
 			HTTPStatus: http.StatusInternalServerError,
@@ -226,5 +226,6 @@ func (s *AuthService) GetUserById(userId int) (entity.User, error) {
 }
 
 func (s *AuthService) DeleteUser(userId int) error {
+	fmt.Println(userId)
 	return s.storage.DeleteUser(userId)
 }
